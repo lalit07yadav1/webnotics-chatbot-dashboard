@@ -1,11 +1,24 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 
+function tokenExists(): boolean {
+  try {
+    return Boolean(localStorage.getItem("auth_token"));
+  } catch {
+    return false;
+  }
+}
+
 export default function SignInForm() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   return (
     <div className="flex flex-col flex-1">
       
@@ -22,18 +35,49 @@ export default function SignInForm() {
           <div>
 
 
-            <form>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setError(null);
+                setLoading(true);
+                try {
+                  const res = await fetch(
+                    "https://webnotics-chatbot.onrender.com/login",
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email, password })
+                    }
+                  );
+                  const data = await res.json();
+                  if (!res.ok || !data?.success) {
+                    throw new Error(data?.detail || data?.message || "Login failed");
+                  }
+                  if (data?.token) {
+                    try { localStorage.setItem("auth_token", data.token); } catch {}
+                  }
+                  // Delay redirect by 10 seconds
+                  setTimeout(() => {
+                    navigate("/", { replace: true });
+                  }, 10000);
+                } catch (err: any) {
+                  setError(err.message);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
               <div className="space-y-6">
                 <div>
-                 
-                  <Input placeholder="you@example.com" />
+                  <Input placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </div>
                 <div>
-                 
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -57,10 +101,14 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
-                    Sign in
+                  <Button className="w-full" size="sm" type="submit" disabled={loading}>
+                    {loading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
+                {error && <p className="text-sm text-red-500">{error}</p>}
+                {!error && loading === false && (tokenExists()) && (
+                  <p className="text-sm text-green-500">Login successful...</p>
+                )}
               </div>
             </form>
 

@@ -4,12 +4,13 @@ import { FormEvent, useMemo, useState } from "react";
 import countries from "../../data/countries.json";
 import statesByCountry from "../../data/states.json";
 import { State } from "country-state-city";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 export default function SignUpForm() {
+  const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
 
@@ -76,6 +77,7 @@ export default function SignUpForm() {
       if (data.success) {
         setSuccess(true);
         console.log('Free account created:', data);
+        setTimeout(() => navigate('/signin', { replace: true }), 4000);
       }
     } catch (err: any) {
       setError(err.message);
@@ -152,6 +154,7 @@ export default function SignUpForm() {
           subscriptionId: data.stripe_subscription_id,
           status: data.subscription_status
         });
+        setTimeout(() => navigate('/signin', { replace: true }), 4000);
       }
     } catch (err: any) {
       setError(err.message);
