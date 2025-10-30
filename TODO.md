@@ -1,0 +1,1 @@
+- [x] Edit src/App.tsx to restructure routes: change the root route inside AppLayout to path="/dashboard" with <Home />, and add a new root route outside AppLayout pointing to <SignUp />

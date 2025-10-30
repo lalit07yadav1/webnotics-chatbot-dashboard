@@ -1,38 +1,31 @@
-import { lazy, Suspense } from 'react';
-import { Link, Route, Routes, Navigate } from 'react-router-dom';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-
-const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
-
-const stripePromise = loadStripe(
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string
-);
+import { BrowserRouter as Router, Routes, Route } from "react-router";
+import SignIn from "./pages/AuthPages/SignIn";
+import SignUp from "./pages/AuthPages/SignUp";
+import NotFound from "./pages/OtherPage/NotFound";
+import AppLayout from "./layout/AppLayout";
+import { ScrollToTop } from "./components/common/ScrollToTop";
+import Home from "./pages/Dashboard/Home";
 
 export default function App() {
   return (
-    <div className="app">
-      <header className="header">
-        <nav className="nav">
-          <Link to="/login">Login</Link>
-          <Link to="/signup">Sign Up</Link>
-        </nav>
-      </header>
-      <main className="main">
-        <Suspense fallback={<div>Loading...</div>}>
-          <Elements stripe={stripePromise}>
-            <Routes>
-              <Route path="/" element={<Navigate to="/signup" replace />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="*" element={<Navigate to="/signup" replace />} />
-            </Routes>
-          </Elements>
-        </Suspense>
-      </main>
-    </div>
+    <>
+      <Router>
+        <ScrollToTop />
+        <Routes>
+          {/* Auth Layout */}
+          <Route path="/" element={<SignUp />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+
+          {/* Dashboard Layout */}
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<Home />} />
+          </Route>
+
+          {/* Fallback Route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
-
-
