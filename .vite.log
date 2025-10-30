@@ -1,0 +1,6 @@
+error when starting dev server:
+Error: listen EPERM: operation not permitted 0.0.0.0:3000
+    at Server.setupListenHandle [as _listen2] (node:net:1917:21)
+    at listenInCluster (node:net:1996:12)
+    at Server.listen (node:net:2101:7)
+    at httpServer.listen (file:///Volumes/Work/project/webnotics%20chatbot/git-webnotics-chatbot-dashboard/webnotics-chatbot-dashboard/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:63419:14)
