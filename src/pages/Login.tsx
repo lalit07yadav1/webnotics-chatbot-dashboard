@@ -31,7 +31,7 @@ export default function Login() {
 
   return (
     <div className="card">
-      <h1 className="title">Login</h1>
+      <h1 className="title">Login here</h1>
       <form className="stack" onSubmit={handleLogin}>
         <input
           type="email"
