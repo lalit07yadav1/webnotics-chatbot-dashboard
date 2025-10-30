@@ -1,6 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
+import countries from "../../data/countries.json";
+import statesByCountry from "../../data/states.json";
+import { State } from "country-state-city";
 import { Link } from "react-router";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
@@ -14,6 +17,7 @@ export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
   const [country, setCountry] = useState("");
   const [stateRegion, setStateRegion] = useState("");
   const [address1, setAddress1] = useState("");
@@ -29,6 +33,21 @@ export default function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // derive state options for selected country
+  const stateOptions = useMemo(() => {
+    if (!country) return [];
+    let libStates: string[] = [];
+    try {
+      libStates = State.getStatesOfCountry(country).map((s) => s.name);
+    } catch {
+      libStates = [];
+    }
+    const local = (statesByCountry as Record<string, string[]>)[country] ?? [];
+    // Use union to ensure completeness while allowing local overrides
+    const merged = Array.from(new Set<string>([...libStates, ...local]));
+    return merged.sort((a, b) => a.localeCompare(b));
+  }, [country]);
+
   const handleFreeAccountCreation = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -41,6 +60,7 @@ export default function SignUpForm() {
           email: email,
           name: name,
           phone_number: phoneNumber || null,
+          password: password || null,
           subscription_type: 'free',
           country: country || null,
           state: stateRegion || null,
@@ -104,6 +124,7 @@ export default function SignUpForm() {
           email: email,
           name: name,
           phone_number: phoneNumber || null,
+          password: password || null,
           subscription_type: 'paid',
           payment_method_id: paymentMethod?.id,
           country: country || null,
@@ -171,27 +192,50 @@ export default function SignUpForm() {
 
           <div>
             <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+          </div>
+
+          <div>
+            <Input
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Optional"
+              placeholder="Phone Number"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <Input
+              <select
+                className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white"
                 value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="Country"
-              />
+                onChange={(e) => {
+                  setCountry(e.target.value);
+                  setStateRegion("");
+                }}
+              >
+                <option value="">Select country</option>
+                {countries.map((c) => (
+                  <option key={c.code} value={c.code}>{c.name}</option>
+                ))}
+              </select>
             </div>
             <div>
-              <Input
+              <select
+                className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white"
                 value={stateRegion}
                 onChange={(e) => setStateRegion(e.target.value)}
-                placeholder="State/Region"
-              />
+                disabled={!country}
+              >
+                <option value="">{country ? "Select state/region" : "Select country first"}</option>
+                {stateOptions.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
             </div>
           </div>
 

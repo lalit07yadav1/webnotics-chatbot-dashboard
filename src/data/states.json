@@ -1,0 +1,19 @@
+{
+  "US": [
+    "Alabama", "Alaska", "Arizona", "California", "Florida", "New York", "Texas"
+  ],
+  "IN": [
+    "Andhra Pradesh", "Delhi", "Gujarat", "Karnataka", "Maharashtra", "Rajasthan", "Uttar Pradesh"
+  ],
+  "CA": [
+    "Alberta", "British Columbia", "Ontario", "Quebec"
+  ],
+  "GB": [
+    "England", "Northern Ireland", "Scotland", "Wales"
+  ],
+  "AU": [
+    "New South Wales", "Queensland", "South Australia", "Tasmania", "Victoria", "Western Australia"
+  ]
+}
+
+
