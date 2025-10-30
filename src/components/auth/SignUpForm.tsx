@@ -164,7 +164,21 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
+    <div className="relative flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
+
+      {loading && (
+        <div
+          className="absolute inset-0 z-50 grid place-items-center bg-black/40 backdrop-blur-sm"
+          role="status"
+          aria-live="polite"
+          aria-label="Creating account"
+        >
+          <div className="flex flex-col items-center gap-3">
+            <span className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />
+            <span className="text-white text-sm">Processing…</span>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div className="mb-6">
