@@ -7,6 +7,9 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthRoute from "./components/auth/AuthRoute";
+import WebsiteUrlManagement from "./pages/ManageScript/WebsiteUrlManagement";
+import FaqManagement from "./pages/ManageScript/FaqManagement";
+import KnowledgeBaseManagement from "./pages/ManageScript/KnowledgeBaseManagement";
 
 export default function App() {
   return (
@@ -37,6 +40,9 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<Home />} />
+            <Route path="/manage-script/website-urls" element={<WebsiteUrlManagement />} />
+            <Route path="/manage-script/faq" element={<FaqManagement />} />
+            <Route path="/manage-script/knowledge-base" element={<KnowledgeBaseManagement />} />
           </Route>
 
           {/* Fallback Route */}
