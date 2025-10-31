@@ -9,6 +9,8 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+
 export default function SignUpForm() {
   const navigate = useNavigate();
   const stripe = useStripe();
@@ -54,7 +56,7 @@ export default function SignUpForm() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://webnotics-chatbot.onrender.com/create-account', {
+      const response = await fetch(`${API_BASE_URL}/create-account`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -119,7 +121,7 @@ export default function SignUpForm() {
       if (pmError) {
         throw new Error(pmError.message);
       }
-      const response = await fetch('https://webnotics-chatbot.onrender.com/create-account', {
+      const response = await fetch(`${API_BASE_URL}/create-account`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
