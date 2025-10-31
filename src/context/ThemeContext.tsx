@@ -24,14 +24,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     const initialTheme = savedTheme || "dark"; // Default to dark theme
 
     setTheme(initialTheme);
-    document.documentElement.classList.toggle("dark", initialTheme === "dark");
+    // Always apply dark theme
+    document.documentElement.classList.add("dark");
     setIsInitialized(true);
   }, []);
 
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem("theme", theme);
-      document.documentElement.classList.toggle("dark", theme === "dark");
+      // Always keep dark theme applied
+      document.documentElement.classList.add("dark");
     }
   }, [theme, isInitialized]);
 
