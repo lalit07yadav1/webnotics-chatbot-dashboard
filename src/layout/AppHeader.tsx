@@ -5,8 +5,12 @@ import { useSidebar } from "../context/SidebarContext";
 import UserDropdown from "../components/header/UserDropdown";
 import { PremiumIcon } from "../icons";
 
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [subscriptionType, setSubscriptionType] = useState<string>("");
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
@@ -25,6 +29,24 @@ const AppHeader: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // Fetch current user profile using bearer token
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        fetch(`${API_BASE_URL}/accounts/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => {
+            if (data) {
+              setUserEmail(data.email || "");
+              setSubscriptionType(data.subscription_type || "");
+            }
+          })
+          .catch(() => {});
+      }
+    } catch { /* ignore */ }
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {
         event.preventDefault();
@@ -112,16 +134,12 @@ const AppHeader: React.FC = () => {
           className={`${isApplicationMenuOpen ? "flex" : "hidden"
             } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
         >
-          <span
-
-            className="flex items-center gap-1 px-2 py-0.5 font-medium text-gray-700 rounded-2xl group text-theme-sm bg-white"
-          >
-
+          <span className="flex items-center gap-1 px-2 py-0.5 font-medium text-gray-700 rounded-2xl group text-theme-sm bg-white">
             <PremiumIcon className="text-gray-800 size-5" />
-            Premium
+            {subscriptionType === 'paid' ? 'Premium' : 'Free'}
           </span>
           {/* <!-- User Area --> */}
-          <UserDropdown />
+          <UserDropdown email={userEmail} />
         </div>
       </div>
     </header>

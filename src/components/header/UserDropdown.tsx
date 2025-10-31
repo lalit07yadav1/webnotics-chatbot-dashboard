@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useNavigate } from "react-router";
 
-export default function UserDropdown() {
+interface Props { email?: string }
+
+export default function UserDropdown({ email }: Props) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,7 +29,7 @@ export default function UserDropdown() {
       >
 
 
-        <span className="block mr-1 font-medium text-theme-sm">user@gmail.com</span>
+        <span className="block mr-1 font-medium text-theme-sm">{email || 'user'}</span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
             }`}
