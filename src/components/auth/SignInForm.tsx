@@ -4,6 +4,8 @@ import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+
 function tokenExists(): boolean {
   try {
     return Boolean(localStorage.getItem("auth_token"));
@@ -42,7 +44,7 @@ export default function SignInForm() {
                 setLoading(true);
                 try {
                   const res = await fetch(
-                    "https://webnotics-chatbot.onrender.com/login",
+                    `${API_BASE_URL}/login`,
                     {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
@@ -58,8 +60,8 @@ export default function SignInForm() {
                   }
                   // Delay redirect by 10 seconds
                   setTimeout(() => {
-                    navigate("/", { replace: true });
-                  }, 10000);
+                    navigate("/dashboard", { replace: true });
+                  }, 5000);
                 } catch (err: any) {
                   setError(err.message);
                 } finally {
