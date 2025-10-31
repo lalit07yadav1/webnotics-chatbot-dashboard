@@ -5,6 +5,8 @@ import NotFound from "./pages/OtherPage/NotFound";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import UserProfile from "./pages/UserProfile";
+import Subscription from "./pages/Subscription";
 
 export default function App() {
   return (
@@ -17,9 +19,11 @@ export default function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
 
-          {/* Dashboard Layout */}
+          {/* inner Layout */}
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Home />} />
+            <Route path="/userprofile" element={<UserProfile />} />
+            <Route path="/subscription" element={<Subscription />} />
           </Route>
 
           {/* Fallback Route */}

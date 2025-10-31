@@ -1,0 +1,31 @@
+{
+    // Use ESLint Flat Config (the new standard)
+    "eslint.experimental.useFlatConfig": true,
+    // Ensure ESLint validates JS/TS/React files
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    // Auto-fix issues with ESLint when saving
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    // Format code on save
+    "editor.formatOnSave": true,
+    // Enable Prettier integration for consistent formatting
+    "prettier.enable": true,
+    // Ensure TypeScript validation stays active
+    "typescript.validate.enable": true,
+    // Show ESLint status in the status bar
+    "eslint.alwaysShowStatus": true,
+    // Optional: point VS Code to use local TypeScript version
+    "typescript.tsdk": "node_modules/typescript/lib",
+    // Optional: let ESLint detect the right working directory automatically
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ]
+}

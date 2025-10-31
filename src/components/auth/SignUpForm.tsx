@@ -182,7 +182,7 @@ export default function SignUpForm() {
 
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div className="mb-6">
-          <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+          <h1 className="mb-2 font-semibold  text-title-sm text-white/90 sm:text-title-md">
             Create your account
           </h1>
 
@@ -228,7 +228,7 @@ export default function SignUpForm() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
               <select
-                className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white"
+                className="w-full border rounded-lg px-3 py-2 bg-gray-800 text-white"
                 value={country}
                 onChange={(e) => {
                   setCountry(e.target.value);
@@ -243,7 +243,7 @@ export default function SignUpForm() {
             </div>
             <div>
               <select
-                className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white"
+                className="w-full border rounded-lg px-3 py-2 bg-gray-800 text-white"
                 value={stateRegion}
                 onChange={(e) => setStateRegion(e.target.value)}
                 disabled={!country}
@@ -282,7 +282,7 @@ export default function SignUpForm() {
 
           <div>
             <select
-              className="w-full border rounded-lg px-3 py-2 dark:bg-gray-800 dark:text-white"
+              className="w-full border rounded-lg px-3 py-2 bg-gray-800 text-white"
               value={subscriptionType}
               onChange={(e) =>
                 setSubscriptionType(e.target.value as "free" | "paid")
@@ -294,7 +294,7 @@ export default function SignUpForm() {
           </div>
 
           {subscriptionType === "paid" && (
-            <div className="p-4 border rounded-lg dark:border-gray-700">
+            <div className="p-4 border rounded-lg border-gray-700">
               <CardElement
                 options={{
                   style: {
@@ -315,7 +315,7 @@ export default function SignUpForm() {
               checked={isChecked}
               onChange={setIsChecked}
             />
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-400">
               By creating an account, you agree to our{" "}
               <span className="text-brand-500">Terms</span> and{" "}
               <span className="text-brand-500">Privacy Policy</span>.
@@ -337,7 +337,7 @@ export default function SignUpForm() {
             </p>
           )}
 
-          <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-center text-gray-400">
             Already have an account?{" "}
             <Link
               to="/signin"

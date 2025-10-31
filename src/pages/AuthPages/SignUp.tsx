@@ -12,8 +12,8 @@ export default function SignUp() {
   return (
     <>
       <PageMeta
-        title="Webnotics Admin Dashboard"
-        description="Webnotics Admin Dashboard"
+        title="Webnotics Admin Dashboard | Sign up"
+        description="Webnotics Admin Dashboard | Sign up"
       />
       <AuthLayout>
         <Elements stripe={stripePromise}>

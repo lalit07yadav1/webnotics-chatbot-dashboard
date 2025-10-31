@@ -6,6 +6,8 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
+  PremiumIcon,
+  UserIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
@@ -22,7 +24,16 @@ const navItems: NavItem[] = [
     name: "Dashboard",
     path: "/dashboard",
   },
-
+  {
+    icon: <UserIcon />,
+    name: "User Profile",
+    path: "/userProfile",
+  },
+  {
+    icon: <PremiumIcon />,
+    name: "Subscription",
+    path: "/subscription",
+  },
 
 
 ];

@@ -7,8 +7,8 @@ export default function Home() {
   return (
     <>
       <PageMeta
-        title="Webnotics Admin Dashboard"
-        description="Webnotics Admin Dashboard"
+        title="Webnotics Admin Dashboard | Overview"
+        description="Webnotics Admin Dashboard | Overview"
       />
       <div className="grid grid-cols-12 gap-4 md:gap-6">
         <div className="col-span-12 space-y-6 xl:col-span-12">
@@ -25,9 +25,9 @@ export default function Home() {
         </div>
 
         <div className="col-span-12">
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
+          <div className="overflow-hidden rounded-2xl border px-5 pt-5border-gray-800bg-white/[0.03] sm:px-6 sm:pt-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              <h3 className="text-lg font-semibold text-white/90">
                 Recent Activity
               </h3>
 
@@ -38,15 +38,15 @@ export default function Home() {
 
                 <div className="flex items-end justify-between">
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg dark:text-white/90">
+                    <h4 className="font-boldtext-lg text-white/90">
                       Support Bot
                     </h4>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-gray-400">
                       Answered customer query about pricing
                     </span>
 
                   </div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">2 min ago</span>
+                  <span className="text-sm text-gray-400">2 min ago</span>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-800 bg-black p-3 md:p-4">
@@ -54,15 +54,15 @@ export default function Home() {
 
                 <div className="flex items-end justify-between">
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg dark:text-white/90">
+                    <h4 className="font-bold text-lg text-white/90">
                       Sales Bot
                     </h4>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-gray-400">
                       Converted lead to qualified prospect
                     </span>
 
                   </div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">5 min ago</span>
+                  <span className="text-sm text-gray-400">5 min ago</span>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-800 bg-black p-3 md:p-4">
@@ -70,15 +70,15 @@ export default function Home() {
 
                 <div className="flex items-end justify-between">
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg dark:text-white/90">
+                    <h4 className="font-bold  text-lg text-white/90">
                       FAQ Bot
                     </h4>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm  text-gray-400">
                       Resolved 5 common questions
                     </span>
 
                   </div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">2 min ago</span>
+                  <span className="text-sm text-gray-400">2 min ago</span>
                 </div>
               </div>
               <div className="rounded-2xl border border-gray-800 bg-black p-3 md:p-4">
@@ -86,15 +86,15 @@ export default function Home() {
 
                 <div className="flex items-end justify-between">
                   <div>
-                    <h4 className="font-bold text-gray-800 text-lg dark:text-white/90">
+                    <h4 className="font-bold text-lg text-white/90">
                       Welcome Bot
                     </h4>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm  text-gray-400">
                       Greeted 12 new visitors
                     </span>
 
                   </div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">10 min ago</span>
+                  <span className="text-sm text-gray-400">10 min ago</span>
                 </div>
               </div>
             </div>

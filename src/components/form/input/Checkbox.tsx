@@ -19,15 +19,14 @@ const Checkbox: React.FC<CheckboxProps> = ({
 }) => {
   return (
     <label
-      className={`flex items-center space-x-3 group cursor-pointer ${
-        disabled ? "cursor-not-allowed opacity-60" : ""
-      }`}
+      className={`flex items-center space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""
+        }`}
     >
       <div className="relative w-5 h-5">
         <input
           id={id}
           type="checkbox"
-          className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
+          className={`w-5 h-5 appearance-none cursor-pointer border-gray-700 border  checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
           ${className}`}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
@@ -71,7 +70,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
         )}
       </div>
       {label && (
-        <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+        <span className="text-sm font-medium text-gray-200">
           {label}
         </span>
       )}

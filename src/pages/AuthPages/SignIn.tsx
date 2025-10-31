@@ -6,8 +6,8 @@ export default function SignIn() {
   return (
     <>
       <PageMeta
-        title="Webnotics Admin Dashboard"
-        description="Webnotics Admin Dashboard"
+        title="Webnotics Admin Dashboard | Sign in"
+        description="Webnotics Admin Dashboard | Sign in"
       />
       <AuthLayout>
         <SignInForm />
