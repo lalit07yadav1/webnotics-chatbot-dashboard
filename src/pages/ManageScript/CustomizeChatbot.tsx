@@ -45,6 +45,35 @@ export default function CustomizeChatbot() {
   const [editBackgroundColor, setEditBackgroundColor] = useState("#FFFFFF");
   const [editFontFamily, setEditFontFamily] = useState("Arial, sans-serif");
   const [savingEdit, setSavingEdit] = useState(false);
+  const [copiedScriptId, setCopiedScriptId] = useState<string | null>(null);
+
+  function getScriptTag(publishKey: string) {
+    // Use current origin (dashboard URL) for widget.js
+    const widgetUrl = typeof window !== 'undefined' 
+      ? window.location.origin 
+      : 'https://webnotics-chatbot-dashboard.onrender.com';
+    return `<script src="${widgetUrl}/widget.js?publish_key=${publishKey}"></script>`;
+  }
+
+  async function copyScriptTag(script: string, id: string) {
+    try {
+      await navigator.clipboard.writeText(script);
+      setCopiedScriptId(id);
+      setTimeout(() => setCopiedScriptId(null), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = script;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedScriptId(id);
+      setTimeout(() => setCopiedScriptId(null), 2000);
+    }
+  }
 
   async function fetchWebsites() {
     try {
@@ -478,6 +507,21 @@ export default function CustomizeChatbot() {
                         )}
                         <p className="text-gray-500 text-xs mt-2">Created: {new Date(custom.created_at).toLocaleString()}</p>
                       </div>
+                    </div>
+                    <div className="mt-4 p-4 bg-gray-900 rounded-lg border border-gray-700">
+                      <label className="block mb-2 text-sm font-medium text-gray-300">Installation Script</label>
+                      <div className="flex gap-2">
+                        <code className="flex-1 px-3 py-2 bg-black rounded text-xs text-gray-300 font-mono break-all">
+                          {getScriptTag(custom.publish_key)}
+                        </code>
+                        <button
+                          onClick={() => copyScriptTag(getScriptTag(custom.publish_key), custom.id)}
+                          className="px-4 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600 whitespace-nowrap"
+                        >
+                          {copiedScriptId === custom.id ? 'Copied!' : 'Copy'}
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">Copy and paste this script tag before the closing &lt;/body&gt; tag on your website</p>
                     </div>
                     <div className="flex gap-2 mt-4">
                       <button
