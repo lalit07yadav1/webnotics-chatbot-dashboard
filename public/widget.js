@@ -78,6 +78,58 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   }
  
+  // Get IP address
+  let cachedIpAddress = null;
+  async function getIpAddress() {
+    if (cachedIpAddress) return cachedIpAddress;
+    try {
+      // Try JSON format first
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (response.ok) {
+          const data = await response.json();
+          cachedIpAddress = data.ip;
+          if (cachedIpAddress) {
+            return cachedIpAddress;
+          }
+        }
+      } catch (e) {
+        // Fallback to text format
+      }
+      
+      // Fallback: try text format
+      try {
+        const textResponse = await fetch('https://api.ipify.org?format=text');
+        if (textResponse.ok) {
+          cachedIpAddress = (await textResponse.text()).trim();
+          if (cachedIpAddress) {
+            return cachedIpAddress;
+          }
+        }
+      } catch (e) {
+        // Try alternative service
+      }
+      
+      // Alternative service
+      try {
+        const altResponse = await fetch('https://api64.ipify.org?format=json');
+        if (altResponse.ok) {
+          const data = await altResponse.json();
+          cachedIpAddress = data.ip;
+          if (cachedIpAddress) {
+            return cachedIpAddress;
+          }
+        }
+      } catch (e) {
+        // All services failed
+      }
+    } catch (err) {
+      console.warn('Webnotics Chatbot: Failed to fetch IP address', err);
+      return null;
+    }
+    return null;
+  }
+
   // Fetch customization data
   let customization = null;
   let userInfo = getUserInfo();
@@ -479,6 +531,9 @@
     chatContainer.scrollTop = chatContainer.scrollHeight;
  
     try {
+      // Get IP address dynamically
+      const ipAddress = await getIpAddress();
+      
       const response = await fetch(`${API_BASE}/chat?website_url=${encodeURIComponent(customization.website_url)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -487,7 +542,9 @@
           message: message,
           session_id: sessionId,
           user_email: userInfo.email,
-          user_name: userInfo.name
+          user_name: userInfo.name,
+          ip_address: ipAddress || null,
+          publish_key: publishKey
         })
       });
  
