@@ -190,16 +190,7 @@
   // Initialize chatbot UI
   function initChatbot() {
     if (!customization) return;
-
-    // Check if user info exists
-    if (!userInfo) {
-      showUserForm((info) => {
-        userInfo = info;
-        createChatbotUI();
-      });
-      return;
-    }
-
+    // Always create UI - don't show form on load
     createChatbotUI();
   }
 
@@ -278,13 +269,7 @@
       gap: 12px;
     `;
 
-    // Load chat history
-    const history = getChatHistory();
-    history.forEach(msg => {
-      const msgEl = createMessageElement(msg.message, msg.isUser);
-      chatContainer.appendChild(msgEl);
-    });
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    // Load chat history only if user info exists (will be loaded in createChatbotUI)
 
     // Input area
     const inputArea = document.createElement('div');
@@ -321,9 +306,28 @@
       font-family: ${customization.font_family};
     `;
 
-    sendBtn.onclick = () => sendMessage();
+    sendBtn.onclick = () => {
+      if (!userInfo) {
+        showUserForm((info) => {
+          userInfo = info;
+          sendMessage();
+        });
+        return;
+      }
+      sendMessage();
+    };
+    
     input.onkeypress = (e) => {
-      if (e.key === 'Enter') sendMessage();
+      if (e.key === 'Enter') {
+        if (!userInfo) {
+          showUserForm((info) => {
+            userInfo = info;
+            sendMessage();
+          });
+          return;
+        }
+        sendMessage();
+      }
     };
 
     inputArea.appendChild(input);
@@ -353,13 +357,35 @@
       z-index: 999998;
       display: none;
     `;
-    toggleBtn.onclick = toggleChatbot;
+    toggleBtn.onclick = () => {
+      // Check if user info exists before showing chatbot
+      if (!userInfo) {
+        showUserForm((info) => {
+          userInfo = info;
+          toggleChatbot();
+        });
+        return;
+      }
+      toggleChatbot();
+    };
 
     document.body.appendChild(toggleBtn);
     document.body.appendChild(chatbot);
 
     chatbot.style.display = 'none';
     toggleBtn.style.display = 'block';
+    
+    // Load chat history only if user info exists
+    if (userInfo) {
+      const history = getChatHistory();
+      if (history.length > 0) {
+        history.forEach(msg => {
+          const msgEl = createMessageElement(msg.message, msg.isUser);
+          chatContainer.appendChild(msgEl);
+        });
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
   }
 
   function createMessageElement(message, isUser) {
@@ -374,7 +400,31 @@
         : `background: rgba(255,255,255,0.1); color: ${customization.text_color};`
       }
     `;
-    msgEl.textContent = message;
+    
+    // For bot messages, render HTML; for user messages, escape HTML for security
+    if (isUser) {
+      msgEl.textContent = message;
+    } else {
+      // Create a temporary div to sanitize and render HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = message;
+      // Only allow safe HTML tags
+      const allowedTags = ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a'];
+      const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_ELEMENT);
+      const nodesToRemove = [];
+      let node;
+      while (node = walker.nextNode()) {
+        if (!allowedTags.includes(node.tagName.toLowerCase())) {
+          nodesToRemove.push(node);
+        } else if (node.tagName.toLowerCase() === 'a') {
+          node.setAttribute('target', '_blank');
+          node.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+      nodesToRemove.forEach(n => n.replaceWith(...Array.from(n.childNodes)));
+      msgEl.innerHTML = tempDiv.innerHTML;
+    }
+    
     return msgEl;
   }
 
@@ -428,6 +478,7 @@
       const data = await response.json();
       const botMessage = data.message || data.response || 'Sorry, I could not process your request.';
 
+      // Remove any existing messages at the end (in case of duplicates)
       const botMsg = createMessageElement(botMessage, false);
       chatContainer.appendChild(botMsg);
       saveChatMessage(botMessage, false);
@@ -450,6 +501,21 @@
       if (chatbot.style.display === 'none') {
         chatbot.style.display = 'flex';
         toggleBtn.style.display = 'none';
+        // Refresh userInfo in case it was just set
+        userInfo = getUserInfo();
+        // Reload chat history if user info now exists
+        const chatContainer = document.getElementById('webnotics-chat-container');
+        if (chatContainer && userInfo) {
+          const history = getChatHistory();
+          chatContainer.innerHTML = '';
+          if (history.length > 0) {
+            history.forEach(msg => {
+              const msgEl = createMessageElement(msg.message, msg.isUser);
+              chatContainer.appendChild(msgEl);
+            });
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          }
+        }
       } else {
         chatbot.style.display = 'none';
         toggleBtn.style.display = 'block';
