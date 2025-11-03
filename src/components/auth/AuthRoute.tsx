@@ -15,3 +15,4 @@ export default function AuthRoute({ children }: AuthRouteProps) {
   return <>{children}</>;
 }
 
+

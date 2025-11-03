@@ -26,11 +26,12 @@ const navItems: NavItem[] = [
   {
     icon: <HorizontaLDots />, // placeholder icon
     name: "Manage Script",
-    subItems: [
-      { name: "Website URL Management", path: "/manage-script/website-urls" },
-      { name: "FAQ", path: "/manage-script/faq" },
-      { name: "Knowledge Base", path: "/manage-script/knowledge-base" },
-    ],
+     subItems: [
+       { name: "Website URL Management", path: "/manage-script/website-urls" },
+       { name: "FAQ", path: "/manage-script/faq" },
+       { name: "Knowledge Base", path: "/manage-script/knowledge-base" },
+       { name: "Customize Chatbot", path: "/manage-script/customize-chatbot" },
+     ],
   },
 
 

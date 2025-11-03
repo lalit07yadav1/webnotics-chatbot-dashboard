@@ -10,6 +10,7 @@ import AuthRoute from "./components/auth/AuthRoute";
 import WebsiteUrlManagement from "./pages/ManageScript/WebsiteUrlManagement";
 import FaqManagement from "./pages/ManageScript/FaqManagement";
 import KnowledgeBaseManagement from "./pages/ManageScript/KnowledgeBaseManagement";
+import CustomizeChatbot from "./pages/ManageScript/CustomizeChatbot";
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
             <Route path="/manage-script/website-urls" element={<WebsiteUrlManagement />} />
             <Route path="/manage-script/faq" element={<FaqManagement />} />
             <Route path="/manage-script/knowledge-base" element={<KnowledgeBaseManagement />} />
+            <Route path="/manage-script/customize-chatbot" element={<CustomizeChatbot />} />
           </Route>
 
           {/* Fallback Route */}
