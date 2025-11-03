@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import UserDropdown from "../components/header/UserDropdown";
 import { PremiumIcon } from "../icons";
+import { isTokenExpired } from "../utils/tokenUtils";
 
 const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
 
 const AppHeader: React.FC = () => {
+  const navigate = useNavigate();
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [subscriptionType, setSubscriptionType] = useState<string>("");
@@ -29,23 +31,46 @@ const AppHeader: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Fetch current user profile using bearer token
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        fetch(`${API_BASE_URL}/accounts/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-          .then((r) => r.ok ? r.json() : null)
-          .then((data) => {
-            if (data) {
-              setUserEmail(data.email || "");
-              setSubscriptionType(data.subscription_type || "");
-            }
-          })
-          .catch(() => {});
+    // Check token expiry
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      if (isTokenExpired(token)) {
+        // Token expired, redirect to signin
+        localStorage.removeItem("auth_token");
+        navigate("/signin", { replace: true });
+        return;
       }
-    } catch { /* ignore */ }
+      
+      // Check token expiry periodically (every minute)
+      const expiryInterval = setInterval(() => {
+        const currentToken = localStorage.getItem("auth_token");
+        if (currentToken) {
+          if (isTokenExpired(currentToken)) {
+            localStorage.removeItem("auth_token");
+            navigate("/signin", { replace: true });
+            clearInterval(expiryInterval);
+            return;
+          }
+        } else {
+          clearInterval(expiryInterval);
+        }
+      }, 60000); // Check every minute
+
+      // Fetch current user profile using bearer token
+      fetch(`${API_BASE_URL}/accounts/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          if (data) {
+            setUserEmail(data.email || "");
+            setSubscriptionType(data.subscription_type || "");
+          }
+        })
+        .catch(() => {});
+      
+      return () => clearInterval(expiryInterval);
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {

@@ -40,11 +40,28 @@ export default function KnowledgeBaseManagement() {
       const token = localStorage.getItem("auth_token");
       if (!token) throw new Error("Not authenticated");
       const res = await fetch(`${API_BASE_URL}/websites/${websiteId}/knowledge-base`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) throw new Error('Failed to fetch knowledge base');
+      if (!res.ok) {
+        // If 404 or empty response, treat as no data found
+        if (res.status === 404) {
+          setItems([]);
+          setLoading(false);
+          return;
+        }
+        throw new Error('Failed to fetch knowledge base');
+      }
       const data = await res.json();
-      setItems(Array.isArray(data) ? data : [data]);
+      const itemsList = Array.isArray(data) ? data : (data ? [data] : []);
+      setItems(itemsList);
     } catch (err: any) {
-      setListError(err.message);
+      // Only show error for actual errors, not for empty data
+      const errorMessage = err.message || 'Failed to fetch knowledge base';
+      // If it's a network error or authentication error, show it
+      if (errorMessage.includes('Not authenticated') || errorMessage.includes('Failed to fetch')) {
+        setListError(errorMessage);
+      } else {
+        // For other cases, assume no data
+        setItems([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -148,7 +165,7 @@ export default function KnowledgeBaseManagement() {
         <h2 className="mb-4 text-lg font-semibold text-white">Items</h2>
         {loading && <p className="text-gray-400">Loading...</p>}
         {listError && <p className="text-red-500 text-sm">{listError}</p>}
-        {!loading && !listError && items.length === 0 && (<p className="text-gray-400">No items for this website.</p>)}
+        {!loading && !listError && items.length === 0 && (<p className="text-gray-400">No record found</p>)}
         {!loading && !listError && items.length > 0 && (
           <div className="space-y-3">
             {items.map((it) => (

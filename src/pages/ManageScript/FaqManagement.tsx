@@ -42,11 +42,28 @@ export default function FaqManagement() {
       const token = localStorage.getItem("auth_token");
       if (!token) throw new Error("Not authenticated");
       const res = await fetch(`${API_BASE_URL}/websites/${websiteId}/faq`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) throw new Error('Failed to fetch FAQs');
+      if (!res.ok) {
+        // If 404 or empty response, treat as no data found
+        if (res.status === 404) {
+          setFaqs([]);
+          setLoadingFaqs(false);
+          return;
+        }
+        throw new Error('Failed to fetch FAQs');
+      }
       const data = await res.json();
-      setFaqs(Array.isArray(data) ? data : [data]);
+      const faqsList = Array.isArray(data) ? data : (data ? [data] : []);
+      setFaqs(faqsList);
     } catch (err: any) {
-      setFaqError(err.message);
+      // Only show error for actual errors, not for empty data
+      const errorMessage = err.message || 'Failed to fetch FAQs';
+      // If it's a network error or authentication error, show it
+      if (errorMessage.includes('Not authenticated') || errorMessage.includes('Failed to fetch')) {
+        setFaqError(errorMessage);
+      } else {
+        // For other cases, assume no data
+        setFaqs([]);
+      }
     } finally {
       setLoadingFaqs(false);
     }
@@ -171,7 +188,7 @@ export default function FaqManagement() {
         {loadingFaqs && <p className="text-gray-400">Loading...</p>}
         {faqError && <p className="text-red-500 text-sm">{faqError}</p>}
         {!loadingFaqs && !faqError && faqs.length === 0 && (
-          <p className="text-gray-400">No FAQs yet for this website.</p>
+          <p className="text-gray-400">No record found</p>
         )}
         {!loadingFaqs && !faqError && faqs.length > 0 && (
           <div className="space-y-3">

@@ -56,12 +56,14 @@ export default function SignInForm() {
                     throw new Error(data?.detail || data?.message || "Login failed");
                   }
                   if (data?.token) {
-                    try { localStorage.setItem("auth_token", data.token); } catch {}
+                    try { 
+                      localStorage.setItem("auth_token", data.token);
+                    } catch {}
                   }
                   // Delay redirect by 10 seconds
                   setTimeout(() => {
                     navigate("/dashboard", { replace: true });
-                  }, 5000);
+                  }, 2000);
                 } catch (err: any) {
                   setError(err.message);
                 } finally {

@@ -11,8 +11,12 @@ import WebsiteUrlManagement from "./pages/ManageScript/WebsiteUrlManagement";
 import FaqManagement from "./pages/ManageScript/FaqManagement";
 import KnowledgeBaseManagement from "./pages/ManageScript/KnowledgeBaseManagement";
 import CustomizeChatbot from "./pages/ManageScript/CustomizeChatbot";
+import { getValidToken } from "./utils/tokenUtils";
 
 export default function App() {
+  // Check token validity on app load
+  const validToken = getValidToken();
+  
   return (
     <>
       <Router>
@@ -22,7 +26,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              localStorage.getItem("auth_token") ? (
+              validToken ? (
                 <Navigate to="/dashboard" replace />
               ) : (
                 <Navigate to="/signup" replace />

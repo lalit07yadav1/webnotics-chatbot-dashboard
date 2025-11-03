@@ -98,11 +98,28 @@ export default function CustomizeChatbot() {
       const res = await fetch(`${API_BASE_URL}/customize-chatbot`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch customizations');
+      if (!res.ok) {
+        // If 404 or empty response, treat as no data found
+        if (res.status === 404) {
+          setCustomizations([]);
+          setLoading(false);
+          return;
+        }
+        throw new Error('Failed to fetch customizations');
+      }
       const data = await res.json();
-      setCustomizations(Array.isArray(data) ? data : [data]);
+      const customizationsList = Array.isArray(data) ? data : (data ? [data] : []);
+      setCustomizations(customizationsList);
     } catch (err: any) {
-      setListError(err.message);
+      // Only show error for actual errors, not for empty data
+      const errorMessage = err.message || 'Failed to fetch customizations';
+      // If it's a network error or authentication error, show it
+      if (errorMessage.includes('Not authenticated') || errorMessage.includes('Failed to fetch')) {
+        setListError(errorMessage);
+      } else {
+        // For other cases, assume no data
+        setCustomizations([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -366,7 +383,7 @@ export default function CustomizeChatbot() {
         {loading && <p className="text-gray-400">Loading...</p>}
         {listError && <p className="text-red-500 text-sm">{listError}</p>}
         {!loading && !listError && customizations.length === 0 && (
-          <p className="text-gray-400">No customizations yet.</p>
+          <p className="text-gray-400">No record found</p>
         )}
         {!loading && !listError && customizations.length > 0 && (
           <div className="space-y-4">
