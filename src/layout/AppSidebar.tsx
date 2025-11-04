@@ -52,6 +52,14 @@ const adminNavItems: NavItem[] = [
   },
 ];
 
+const freeUserNavItems: NavItem[] = [
+  {
+    icon: <GridIcon />,
+    name: "Upgrade Plan",
+    path: "/upgrade-plan",
+  },
+];
+
 
 
 const AppSidebar: React.FC = () => {
@@ -89,6 +97,8 @@ const AppSidebar: React.FC = () => {
       .then((data) => {
         if (data && data.subscription_type === 'superadmin') {
           setNavItems([...baseNavItems, ...adminNavItems]);
+        } else if (data && data.subscription_type === 'free') {
+          setNavItems([...baseNavItems, ...freeUserNavItems]);
         } else {
           setNavItems(baseNavItems);
         }
