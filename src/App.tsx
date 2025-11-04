@@ -15,6 +15,7 @@ import CustomizeChatbot from "./pages/ManageScript/CustomizeChatbot";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AllMessages from "./pages/Admin/AllMessages";
 import Profile from "./pages/Profile/Profile";
+import ChangePassword from "./pages/Profile/ChangePassword";
 import { getValidToken } from "./utils/tokenUtils";
 
 export default function App() {
@@ -50,6 +51,7 @@ export default function App() {
           >
             <Route path="/dashboard" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/manage-script/website-urls" element={<WebsiteUrlManagement />} />
             <Route path="/manage-script/faq" element={<FaqManagement />} />
             <Route path="/manage-script/knowledge-base" element={<KnowledgeBaseManagement />} />

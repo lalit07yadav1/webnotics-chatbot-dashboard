@@ -345,6 +345,22 @@ export default function Profile() {
             </div>
           )}
 
+          {/* Change Password Link */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Want to change your password?
+            </p>
+            <Button
+              type="button"
+              onClick={() => navigate("/change-password")}
+              className="w-full"
+              size="sm"
+              variant="outline"
+            >
+              Change Password
+            </Button>
+          </div>
+
           {/* Submit Button */}
           <div className="flex gap-3 pt-4">
             <Button
