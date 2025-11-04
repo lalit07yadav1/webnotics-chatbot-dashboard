@@ -37,6 +37,31 @@ export default function Profile() {
   // Read-only fields
   const [email, setEmail] = useState("");
   const [subscriptionType, setSubscriptionType] = useState("");
+  
+  // Store the state value from API to set after country is loaded
+  const [pendingState, setPendingState] = useState<string>("");
+
+  // Function to find country from state name
+  const findCountryFromState = (stateName: string): string => {
+    if (!stateName) return "";
+    
+    // Try to find the country by searching through all countries
+    for (const countryData of countries) {
+      const countryCode = countryData.code;
+      try {
+        const libStates = State.getStatesOfCountry(countryCode).map((s) => s.name);
+        const local = (statesByCountry as Record<string, string[]>)[countryCode] ?? [];
+        const allStates = Array.from(new Set<string>([...libStates, ...local]));
+        
+        if (allStates.includes(stateName)) {
+          return countryCode;
+        }
+      } catch {
+        // Continue to next country
+      }
+    }
+    return "";
+  };
 
   // Get state options based on selected country
   const stateOptions = useMemo(() => {
@@ -80,8 +105,20 @@ export default function Profile() {
         setName(data.name || "");
         setPhoneNumber(data.phone_number || "");
         setCity(data.city || "");
-        setCountry(data.country || "");
-        setStateRegion(data.state || "");
+        
+        // Handle country and state - check multiple possible field names
+        const stateValue = data.state || (data as any).state_region || "";
+        let countryValue = data.country || (data as any).country_code || "";
+        
+        // If country is not provided but state is, try to find the country
+        if (!countryValue && stateValue) {
+          countryValue = findCountryFromState(stateValue);
+        }
+        
+        // Set country first, then state (so state dropdown gets populated)
+        setCountry(countryValue);
+        // Store state value to set after country dropdown is populated
+        setPendingState(stateValue);
 
         // Set read-only fields
         setEmail(data.email || "");
@@ -95,6 +132,17 @@ export default function Profile() {
 
     fetchProfile();
   }, [navigate]);
+
+  // Set state after country is loaded and state options are available
+  useEffect(() => {
+    if (country && pendingState && stateOptions.length > 0) {
+      // Check if the pending state exists in the available options
+      if (stateOptions.includes(pendingState)) {
+        setStateRegion(pendingState);
+        setPendingState(""); // Clear pending state
+      }
+    }
+  }, [country, pendingState, stateOptions]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
