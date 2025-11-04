@@ -161,7 +161,7 @@ const AppHeader: React.FC = () => {
         >
           <span className="flex items-center gap-1 px-2 py-0.5 font-medium text-gray-700 rounded-2xl group text-theme-sm bg-white">
             <PremiumIcon className="text-gray-800 size-5" />
-            {subscriptionType === 'paid' ? 'Premium' : 'Free'}
+            {subscriptionType === 'superadmin' ? 'Super Admin' : subscriptionType === 'paid' ? 'Premium' : 'Free'}
           </span>
           {/* <!-- User Area --> */}
           <UserDropdown email={userEmail} />

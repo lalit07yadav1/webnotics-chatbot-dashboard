@@ -7,10 +7,13 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthRoute from "./components/auth/AuthRoute";
+import SuperAdminRoute from "./components/auth/SuperAdminRoute";
 import WebsiteUrlManagement from "./pages/ManageScript/WebsiteUrlManagement";
 import FaqManagement from "./pages/ManageScript/FaqManagement";
 import KnowledgeBaseManagement from "./pages/ManageScript/KnowledgeBaseManagement";
 import CustomizeChatbot from "./pages/ManageScript/CustomizeChatbot";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import Profile from "./pages/Profile/Profile";
 import { getValidToken } from "./utils/tokenUtils";
 
 export default function App() {
@@ -45,10 +48,22 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/manage-script/website-urls" element={<WebsiteUrlManagement />} />
             <Route path="/manage-script/faq" element={<FaqManagement />} />
             <Route path="/manage-script/knowledge-base" element={<KnowledgeBaseManagement />} />
             <Route path="/manage-script/customize-chatbot" element={<CustomizeChatbot />} />
+          </Route>
+
+          {/* Admin Dashboard Layout - SuperAdmin Only Routes */}
+          <Route
+            element={
+              <SuperAdminRoute>
+                <AppLayout />
+              </SuperAdminRoute>
+            }
+          >
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Route>
 
           {/* Fallback Route */}

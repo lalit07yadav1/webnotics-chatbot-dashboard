@@ -8,15 +8,19 @@ import {
   HorizontaLDots,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
+import { getValidToken } from "../utils/tokenUtils";
+
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  superAdminOnly?: boolean;
 };
 
-const navItems: NavItem[] = [
+const baseNavItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
@@ -33,9 +37,14 @@ const navItems: NavItem[] = [
        { name: "Customize Chatbot", path: "/manage-script/customize-chatbot" },
      ],
   },
+];
 
-
-
+const adminNavItems: NavItem[] = [
+  {
+    icon: <GridIcon />,
+    name: "All Users",
+    path: "/admin-dashboard",
+  },
 ];
 
 
@@ -43,6 +52,7 @@ const navItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
+  const [navItems, setNavItems] = useState<NavItem[]>(baseNavItems);
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main";
@@ -58,6 +68,30 @@ const AppSidebar: React.FC = () => {
     (path: string) => location.pathname === path,
     [location.pathname]
   );
+
+  // Check if user is superadmin
+  useEffect(() => {
+    const token = getValidToken();
+    if (!token) {
+      setNavItems(baseNavItems);
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/accounts/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data && data.subscription_type === 'superadmin') {
+          setNavItems([...baseNavItems, ...adminNavItems]);
+        } else {
+          setNavItems(baseNavItems);
+        }
+      })
+      .catch(() => {
+        setNavItems(baseNavItems);
+      });
+  }, []);
 
   useEffect(() => {
     let submenuMatched = false;

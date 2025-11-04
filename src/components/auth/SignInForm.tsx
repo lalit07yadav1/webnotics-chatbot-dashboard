@@ -58,12 +58,36 @@ export default function SignInForm() {
                   if (data?.token) {
                     try { 
                       localStorage.setItem("auth_token", data.token);
+                      
+                      // Check if user is superadmin and redirect accordingly
+                      fetch(`${API_BASE_URL}/accounts/me`, {
+                        headers: { Authorization: `Bearer ${data.token}` }
+                      })
+                        .then((r) => r.ok ? r.json() : null)
+                        .then((userData) => {
+                          if (userData && userData.subscription_type === 'superadmin') {
+                            setTimeout(() => {
+                              navigate("/admin-dashboard", { replace: true });
+                            }, 2000);
+                          } else {
+                            setTimeout(() => {
+                              navigate("/dashboard", { replace: true });
+                            }, 2000);
+                          }
+                        })
+                        .catch(() => {
+                          // Fallback to regular dashboard if check fails
+                          setTimeout(() => {
+                            navigate("/dashboard", { replace: true });
+                          }, 2000);
+                        });
                     } catch {}
+                  } else {
+                    // Fallback if no token
+                    setTimeout(() => {
+                      navigate("/dashboard", { replace: true });
+                    }, 2000);
                   }
-                  // Delay redirect by 10 seconds
-                  setTimeout(() => {
-                    navigate("/dashboard", { replace: true });
-                  }, 2000);
                 } catch (err: any) {
                   setError(err.message);
                 } finally {

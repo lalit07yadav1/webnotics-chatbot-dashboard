@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 interface Props { email?: string }
 
@@ -54,6 +54,28 @@ export default function UserDropdown({ email }: Props) {
         onClose={closeDropdown}
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-black p-3 shadow-theme-lg"
       >
+        <Link
+          to="/profile"
+          onClick={closeDropdown}
+          className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm bg-white/5 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 w-full text-left"
+        >
+          <svg
+            className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12ZM12 14C8.66797 14 2 15.3359 2 18.5V20C2 20.5523 2.44772 21 3 21H21C21.5523 21 22 20.5523 22 20V18.5C22 15.3359 15.332 14 12 14Z"
+              fill=""
+            />
+          </svg>
+          Profile
+        </Link>
 
         <button
           onClick={handleSignOut}
