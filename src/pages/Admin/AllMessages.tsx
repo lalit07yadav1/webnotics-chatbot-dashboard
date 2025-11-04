@@ -3,6 +3,49 @@ import { getValidToken } from "../../utils/tokenUtils";
 
 const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
 
+// Function to sanitize and render HTML safely
+const renderHTML = (htmlString: string): string => {
+  if (!htmlString || typeof window === 'undefined') return htmlString || "";
+  
+  try {
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    
+    // Only allow safe HTML tags
+    const allowedTags = ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'span', 'div'];
+    const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_ELEMENT);
+    const nodesToRemove: Node[] = [];
+    let node: Node | null;
+    
+    while ((node = walker.nextNode())) {
+      const element = node as Element;
+      if (!allowedTags.includes(element.tagName.toLowerCase())) {
+        nodesToRemove.push(node);
+      } else if (element.tagName.toLowerCase() === 'a') {
+        element.setAttribute('target', '_blank');
+        element.setAttribute('rel', 'noopener noreferrer');
+      }
+    }
+    
+    // Remove disallowed tags while preserving their content
+    nodesToRemove.forEach(n => {
+      if (n.parentNode) {
+        while (n.firstChild) {
+          n.parentNode.insertBefore(n.firstChild, n);
+        }
+        n.parentNode.removeChild(n);
+      }
+    });
+    
+    return tempDiv.innerHTML;
+  } catch (error) {
+    console.error('Error rendering HTML:', error);
+    // Return escaped version if sanitization fails
+    return htmlString.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+};
+
 interface Message {
   id: number;
   username: string | null;
@@ -319,9 +362,14 @@ export default function AllMessages() {
                                       <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                                         AI Response:
                                       </div>
-                                      <div className="text-sm text-gray-800 dark:text-gray-200 bg-blue-50 dark:bg-blue-900/20 rounded p-2">
-                                        {message.ai_response}
-                                      </div>
+                                      <div 
+                                        className="text-sm text-gray-800 dark:text-gray-200 bg-blue-50 dark:bg-blue-900/20 rounded p-2 prose prose-sm max-w-none dark:prose-invert"
+                                        dangerouslySetInnerHTML={{ __html: renderHTML(message.ai_response) }}
+                                        style={{
+                                          wordBreak: 'break-word',
+                                          lineHeight: '1.5'
+                                        }}
+                                      />
                                     </div>
                                   </div>
                                 </div>
