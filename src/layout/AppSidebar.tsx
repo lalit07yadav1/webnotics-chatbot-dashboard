@@ -45,6 +45,11 @@ const adminNavItems: NavItem[] = [
     name: "All Users",
     path: "/admin-dashboard",
   },
+  {
+    icon: <GridIcon />,
+    name: "All Messages",
+    path: "/admin-messages",
+  },
 ];
 
 

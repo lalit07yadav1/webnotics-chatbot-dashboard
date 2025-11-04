@@ -13,6 +13,7 @@ import FaqManagement from "./pages/ManageScript/FaqManagement";
 import KnowledgeBaseManagement from "./pages/ManageScript/KnowledgeBaseManagement";
 import CustomizeChatbot from "./pages/ManageScript/CustomizeChatbot";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AllMessages from "./pages/Admin/AllMessages";
 import Profile from "./pages/Profile/Profile";
 import { getValidToken } from "./utils/tokenUtils";
 
@@ -64,6 +65,7 @@ export default function App() {
             }
           >
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin-messages" element={<AllMessages />} />
           </Route>
 
           {/* Fallback Route */}
