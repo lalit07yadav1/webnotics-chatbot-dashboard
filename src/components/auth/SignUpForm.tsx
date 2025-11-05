@@ -319,8 +319,8 @@ export default function SignUpForm() {
             />
             <p className="text-sm text-gray-500 dark:text-gray-400">
               By creating an account, you agree to our{" "}
-              <span className="text-brand-500">Terms</span> and{" "}
-              <span className="text-brand-500">Privacy Policy</span>.
+              <Link to="/home/terms" className="text-brand-500 hover:text-brand-600">Terms</Link> and{" "}
+              <Link to="/home/privacy-policy" className="text-brand-500 hover:text-brand-600">Privacy Policy</Link>.
             </p>
           </div>
 
@@ -339,15 +339,25 @@ export default function SignUpForm() {
             </p>
           )}
 
-          <p className="text-sm text-center text-gray-600 dark:text-gray-400">
-            Already have an account?{" "}
-            <Link
-              to="/signin"
-              className="text-brand-500 hover:text-brand-600"
-            >
-              Sign In
-            </Link>
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+              Already have an account?{" "}
+              <Link
+                to="/signin"
+                className="text-brand-500 hover:text-brand-600"
+              >
+                Sign In
+              </Link>
+            </p>
+            <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+              <Link
+                to="/"
+                className="text-brand-500 hover:text-brand-600"
+              >
+                ← Back to Home
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

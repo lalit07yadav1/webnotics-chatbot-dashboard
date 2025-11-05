@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -17,28 +17,38 @@ import AllMessages from "./pages/Admin/AllMessages";
 import Profile from "./pages/Profile/Profile";
 import ChangePassword from "./pages/Profile/ChangePassword";
 import UpgradePlanPage from "./pages/Upgrade/UpgradePlanPage";
-import { getValidToken } from "./utils/tokenUtils";
+// Public Home Pages
+import Overview from "./pages/Home/Overview";
+import About from "./pages/Home/About";
+import Contact from "./pages/Home/Contact";
+import FAQ from "./pages/Home/FAQ";
+import Features from "./pages/Home/Features";
+import Pricing from "./pages/Home/Pricing";
+import PrivacyPolicy from "./pages/Home/PrivacyPolicy";
+import RefundPolicy from "./pages/Home/RefundPolicy";
+import Terms from "./pages/Home/Terms";
 
 export default function App() {
-  // Check token validity on app load
-  const validToken = getValidToken();
-  
   return (
     <>
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Auth Layout - Redirect if already logged in */}
-          <Route
-            path="/"
-            element={
-              validToken ? (
-                <Navigate to="/dashboard" replace />
-              ) : (
-                <Navigate to="/signup" replace />
-              )
-            }
-          />
+          {/* Public Home Page */}
+          <Route path="/" element={<Overview />} />
+          
+          {/* Public Pages - Accessible to all */}
+          <Route path="/home/overview" element={<Overview />} />
+          <Route path="/home/about" element={<About />} />
+          <Route path="/home/contact" element={<Contact />} />
+          <Route path="/home/faq" element={<FAQ />} />
+          <Route path="/home/features" element={<Features />} />
+          <Route path="/home/pricing" element={<Pricing />} />
+          <Route path="/home/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/home/refund-policy" element={<RefundPolicy />} />
+          <Route path="/home/terms" element={<Terms />} />
+          
+          {/* Auth Pages - Redirect to home if already logged in */}
           <Route path="/signin" element={<AuthRoute><SignIn /></AuthRoute>} />
           <Route path="/signup" element={<AuthRoute><SignUp /></AuthRoute>} />
 
