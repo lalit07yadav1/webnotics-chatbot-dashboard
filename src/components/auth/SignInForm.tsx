@@ -55,38 +55,35 @@ export default function SignInForm() {
                   if (!res.ok || !data?.success) {
                     throw new Error(data?.detail || data?.message || "Login failed");
                   }
-                  if (data?.token) {
-                    try { 
-                      localStorage.setItem("auth_token", data.token);
-                      
-                      // Check if user is superadmin and redirect accordingly
-                      fetch(`${API_BASE_URL}/accounts/me`, {
-                        headers: { Authorization: `Bearer ${data.token}` }
-                      })
-                        .then((r) => r.ok ? r.json() : null)
-                        .then((userData) => {
-                          if (userData && userData.subscription_type === 'superadmin') {
-                            setTimeout(() => {
-                              navigate("/admin-dashboard", { replace: true });
-                            }, 2000);
-                          } else {
-                            setTimeout(() => {
-                              navigate("/dashboard", { replace: true });
-                            }, 2000);
-                          }
-                        })
-                        .catch(() => {
-                          // Fallback to regular dashboard if check fails
-                          setTimeout(() => {
-                            navigate("/dashboard", { replace: true });
-                          }, 2000);
-                        });
-                    } catch {}
-                  } else {
-                    // Fallback if no token
-                    setTimeout(() => {
+                  
+                  if (!data?.token) {
+                    throw new Error("No token received from server");
+                  }
+                  
+                  // Store token immediately
+                  localStorage.setItem("auth_token", data.token);
+                  
+                  // Check if user is superadmin and redirect accordingly
+                  try {
+                    const meRes = await fetch(`${API_BASE_URL}/accounts/me`, {
+                      headers: { Authorization: `Bearer ${data.token}` }
+                    });
+                    
+                    if (meRes.ok) {
+                      const userData = await meRes.json();
+                      if (userData && userData.subscription_type === 'superadmin') {
+                        navigate("/admin-dashboard", { replace: true });
+                      } else {
+                        navigate("/dashboard", { replace: true });
+                      }
+                    } else {
+                      // If /me fails, still navigate to dashboard (token is stored)
                       navigate("/dashboard", { replace: true });
-                    }, 2000);
+                    }
+                  } catch (meError) {
+                    // If /me check fails, still navigate to dashboard (token is stored)
+                    console.error("Error checking user data:", meError);
+                    navigate("/dashboard", { replace: true });
                   }
                 } catch (err: any) {
                   setError(err.message);

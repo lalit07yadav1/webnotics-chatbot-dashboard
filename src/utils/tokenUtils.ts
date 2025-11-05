@@ -32,12 +32,26 @@ export function decodeToken(token: string): TokenPayload | null {
 }
 
 /**
+ * Check if a token is a JWT token (has 3 parts separated by dots)
+ */
+function isJWTToken(token: string): boolean {
+  return token.split('.').length === 3;
+}
+
+/**
  * Check if a token is expired
  * Returns true if token is expired or invalid
+ * For non-JWT tokens, returns false (assumes they're valid)
  */
 export function isTokenExpired(token: string | null): boolean {
   if (!token) {
     return true;
+  }
+
+  // If token is not a JWT, don't try to validate expiration
+  // Assume it's valid and let the backend handle validation
+  if (!isJWTToken(token)) {
+    return false;
   }
 
   const decoded = decodeToken(token);
@@ -130,16 +144,26 @@ export function getTokenExpirationString(token: string | null): string {
 /**
  * Get auth token from localStorage and check if it's valid
  * Returns the token if valid, null if expired or missing
+ * For non-JWT tokens, returns the token if it exists (backend will validate)
  */
 export function getValidToken(): string | null {
   const token = localStorage.getItem('auth_token');
-  if (!token || isTokenExpired(token)) {
-    // Remove expired token
-    if (token) {
-      localStorage.removeItem('auth_token');
-    }
+  if (!token) {
     return null;
   }
+  
+  // For non-JWT tokens, just return them (backend will validate)
+  if (!isJWTToken(token)) {
+    return token;
+  }
+  
+  // For JWT tokens, check expiration
+  if (isTokenExpired(token)) {
+    // Remove expired token
+    localStorage.removeItem('auth_token');
+    return null;
+  }
+  
   return token;
 }
 
@@ -149,5 +173,7 @@ export function getValidToken(): string | null {
 export function clearAuthToken(): void {
   localStorage.removeItem('auth_token');
 }
+
+
 
 
