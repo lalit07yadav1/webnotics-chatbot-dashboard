@@ -2,60 +2,44 @@ import React, { useState } from "react";
 
 const faqs = [
   {
-    q: "How do I add the chatbot to my website?",
-    a: "Sign up, then copy your unique code snippet from the dashboard. Paste it into your website’s HTML before the </body> tag. Done!",
+    q: "How do I create a chatbot?",
+    a: "Start by signing up, then use the visual builder to design your bot and publish instantly—no coding required.",
   },
   {
-    q: "What AI model powers the replies?",
-    a: "Our chatbot uses a secure, state-of-the-art NLP engine that understands and responds in natural language based on your script and settings.",
+    q: "Can I import my own FAQ or documents?",
+    a: "Yes, you can upload documents (PDF, DOCX, TXT) or paste your questions/answers directly into the dashboard.",
   },
   {
-    q: "Do you support multiple languages?",
-    a: "Yes! Our AI can converse in English, Spanish, French, and more. The dashboard makes it easy to localize responses.",
+    q: "How does pricing work?",
+    a: "We offer a free plan for most users and an affordable premium plan for scaling teams. See the Pricing page for details.",
   },
   {
-    q: "What’s included in the Free plan?",
-    a: "You get unlimited messages/month, basic analytics, and email support. Upgrade to Pro anytime for advanced features.",
-  },
-  {
-    q: "How do I upgrade or cancel my subscription?",
-    a: "Head to your dashboard, click 'Billing', then select your preferred plan. Cancel anytime—no questions asked.",
-  },
-  {
-    q: "Is my data secure?",
-    a: "All customer and conversation data is secured using industry-leading encryption and privacy standards (GDPR-compliant).",
-  },
-  {
-    q: "Can I get a refund?",
-    a: "Yes! All paid plans come with a 7-day money-back guarantee.",
-  },
-  {
-    q: "How do I get support?",
-    a: "Chat with us via live chat on the dashboard or email our support team any time. We respond within 24 hours.",
+    q: "Where can I embed my chatbot?",
+    a: "Your chatbot can be embedded on any website or app using our simple code snippet.",
   },
 ];
 
 export default function FAQ() {
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [open, setOpen] = useState(-1);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 flex flex-col items-center px-4 pt-20 pb-28">
-      <div className="max-w-3xl w-full mx-auto">
-        <h1 className="text-4xl font-bold text-brand-400 mb-8 text-center">
-          Frequently Asked Questions
-        </h1>
-        {faqs.map((item, idx) => (
-          <div key={item.q} className="mb-5">
+    <div className="min-h-screen bg-black text-white px-4 py-16">
+      <div className="max-w-3xl mx-auto text-center mb-12">
+        <h1 className="text-5xl font-bold mb-4">FAQ</h1>
+        <p className="text-xl text-gray-400 mb-8">
+          Answers to common questions about setup, integration, and plans.
+        </p>
+      </div>
+      <div className="max-w-2xl mx-auto space-y-4">
+        {faqs.map(({ q, a }, i) => (
+          <div key={i} className="bg-white/5 border border-white/10 rounded-xl">
             <button
-              onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
-              className="w-full text-left px-6 py-4 bg-gray-850 rounded-t-xl text-lg font-semibold text-brand-400 focus:outline-none border-b-2 border-brand-500"
+              onClick={() => setOpen(open === i ? -1 : i)}
+              className="w-full text-left p-5 text-lg font-medium flex justify-between items-center focus:outline-none"
             >
-              {item.q}
+              {q}
+              <span>{open === i ? "−" : "+"}</span>
             </button>
-            {openIdx === idx && (
-              <div className="bg-gray-800 px-6 pb-6 rounded-b-xl text-gray-300 border-b border-brand-700 border-x">
-                {item.a}
-              </div>
-            )}
+            {open === i && <div className="p-5 pt-0 text-gray-300">{a}</div>}
           </div>
         ))}
       </div>

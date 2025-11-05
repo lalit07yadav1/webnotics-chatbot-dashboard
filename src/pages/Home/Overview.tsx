@@ -28,6 +28,7 @@ import {
   Amber,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface HomePageProps {
   onGetStarted: () => void;
@@ -36,6 +37,7 @@ interface HomePageProps {
 
 export default function HomePage({ onGetStarted, onSignIn }: HomePageProps) {
   const [activeDemo, setActiveDemo] = useState(0);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen w-full" style={{ background: "#0a0a0a" }}>
@@ -75,15 +77,15 @@ export default function HomePage({ onGetStarted, onSignIn }: HomePageProps) {
               animate={{ opacity: 1, x: 0 }}
             >
               <Button
-                onClick={onSignIn}
+                onClick={() => navigate("/signin")}
                 variant="ghost"
                 className="text-white/80 hover:text-white hover:bg-white/5 border border-white/10"
               >
                 Sign In
               </Button>
               <Button
-                onClick={onGetStarted}
-                className="bg-black text-white hover:bg-white/90 shadow-xl shadow-white/20"
+                onClick={() => navigate("/signup")}
+                className="bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-600/30 px-6 py-3 rounded-xl font-bold"
               >
                 Get Started Free
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -555,24 +557,28 @@ export default function HomePage({ onGetStarted, onSignIn }: HomePageProps) {
               <h4 className="text-white mb-4">Product</h4>
               <ul className="space-y-3 text-gray-500">
                 <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/features"
+                    className="hover:text-white transition"
+                  >
                     Features
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition">
-                    Templates
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/pricing"
+                    className="hover:text-white transition"
+                  >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/integration"
+                    className="hover:text-white transition"
+                  >
                     Integration
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -581,24 +587,25 @@ export default function HomePage({ onGetStarted, onSignIn }: HomePageProps) {
               <h4 className="text-white mb-4">Resources</h4>
               <ul className="space-y-3 text-gray-500">
                 <li>
-                  <a href="#" className="hover:text-white transition">
-                    Documentation
-                  </a>
+                  <Link
+                    to="/home/contact"
+                    className="hover:text-white transition"
+                  >
+                    Contact
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition">
-                    Tutorials
-                  </a>
+                  <Link to="/home/faq" className="hover:text-white transition">
+                    FAQ
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition">
-                    Design Guide
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/support"
+                    className="hover:text-white transition"
+                  >
                     Support
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -607,24 +614,36 @@ export default function HomePage({ onGetStarted, onSignIn }: HomePageProps) {
               <h4 className="text-white mb-4">Company</h4>
               <ul className="space-y-3 text-gray-500">
                 <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/about"
+                    className="hover:text-white transition"
+                  >
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/privacy-policy"
+                    className="hover:text-white transition"
+                  >
                     Privacy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition">
+                  <Link
+                    to="/home/terms"
+                    className="hover:text-white transition"
+                  >
                     Terms
-                  </a>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/home/refund-policy"
+                    className="hover:text-white transition"
+                  >
+                    Refund
+                  </Link>
                 </li>
               </ul>
             </div>

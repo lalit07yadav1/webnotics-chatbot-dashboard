@@ -1,87 +1,112 @@
 import React from "react";
+import Button from "../../components/ui/button/Button";
+import * as Icons from "../../icons";
+import { useNavigate } from "react-router-dom";
 
 const features = [
   {
-    title: "AI-Powered Smart Replies",
-    desc: "Instant, context-aware responses to your users 24/7 with advanced NLP-powered AI.",
-    icon: "🤖",
+    icon: <Icons.ListIcon className="w-7 h-7 text-blue-400" />, // FAQ
+    title: "FAQ Builder",
+    description:
+      "Easily create and manage common Q&A pairs, keeping your chatbot up to date and relevant for users.",
   },
   {
-    title: "Brand Customization",
-    desc: "Easily match your chatbot to your brand colors, avatar, and tone of voice.",
-    icon: "🎨",
+    icon: <Icons.DocsIcon className="w-7 h-7 text-purple-400" />, // Knowledge
+    title: "Knowledge Base",
+    description:
+      "Upload documents (PDF, DOCX, TXT) and let the bot provide instant, accurate answers from your knowledge base.",
   },
   {
+    icon: <Icons.PlugInIcon className="w-7 h-7 text-green-400" />, // Embed/code
+    title: "One-Click Embed",
+    description:
+      "Just one snippet integrates your chatbot with any major website or platform—no developer required.",
+  },
+  {
+    icon: <Icons.GroupIcon className="w-7 h-7 text-orange-400" />, // Website/teams
+    title: "Multi-Platform Support",
+    description:
+      "Your chatbot is ready to work instantly on websites, apps, or any digital channel you choose.",
+  },
+  {
+    icon: <Icons.PieChartIcon className="w-7 h-7 text-pink-400" />, // Analytics
     title: "Analytics & Insights",
-    desc: "View conversation trends, identify hot topics, and track engagement in an easy dashboard.",
-    icon: "📊",
+    description:
+      "Track conversations, engagement, and user satisfaction metrics right from the dashboard.",
   },
   {
-    title: "Multi-Channel Integrations",
-    desc: "Deploy the chatbot on your website, WhatsApp, Facebook Messenger, and more.",
-    icon: "🌐",
-  },
-  {
-    title: "No-Code Setup",
-    desc: "Get started quickly—just copy the widget script and paste into your site.",
-    icon: "⚡",
-  },
-  {
-    title: "Powerful Dashboard",
-    desc: "Full control—from conversation scripts to detailed billing—all in one place.",
-    icon: "📋",
-  },
-  {
-    title: "Enterprise Grade Security",
-    desc: "Your data is encrypted and privacy-protected—robust controls for all businesses.",
-    icon: "🔒",
-  },
-  {
-    title: "Priority Support",
-    desc: "Our support team is ready to help you succeed—email or live chat help included.",
-    icon: "💬",
+    icon: <Icons.PaperPlaneIcon className="w-7 h-7 text-cyan-400" />, // Custom branding
+    title: "Custom Branding",
+    description:
+      "Easily match your chatbot’s style, name, and colors to your brand, for a fully custom experience.",
   },
 ];
 
 export default function Features() {
+  const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100 pb-20">
-      <div className="max-w-4xl mx-auto px-4 pt-20">
-        <h1 className="text-center text-4xl font-bold mb-3 text-brand-400">
-          Chatbot Features
-        </h1>
-        <p className="text-center text-lg mb-12 text-gray-300">
-          Discover a robust AI chatbot platform built for modern brands and
-          teams.
-        </p>
-        <div className="grid sm:grid-cols-2 gap-8 mb-10">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="bg-gray-850 rounded-xl shadow-md p-7 flex gap-4 items-start hover:shadow-brand-800/20 transition"
+    <div className="relative min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
+      {/* Header & navigation */}
+      <nav className="relative z-10 border-b border-white/5 bg-black/20 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-3">
+            <span
+              className="mr-3 cursor-pointer text-gray-400 hover:text-white"
+              onClick={() => navigate("/home/overview")}
+              tabIndex={0} // for accessibility
+              role="button"
+              onKeyPress={(e) => {
+                if (e.key === "Enter" || e.key === " ")
+                  navigate("/home/overview");
+              }}
             >
-              <span className="text-3xl flex-shrink-0 select-none">
-                {f.icon}
-              </span>
-              <div>
-                <div className="font-bold text-lg text-white mb-1">
-                  {f.title}
-                </div>
-                <div className="text-gray-300 leading-relaxed">{f.desc}</div>
-              </div>
+              ← Back
+            </span>
+            <div className="relative w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow">
+              <Icons.ChatIcon className="w-6 h-6 text-black" />
             </div>
-          ))}
+            <span className="text-xl tracking-tight text-white font-semibold ml-1">
+              ChatBot Pro
+            </span>
+          </div>
+          <Button className="bg-black text-white font-bold px-6 py-2 rounded-full shadow-lg hover:bg-blue-light-100">
+            Get Started Free →
+          </Button>
         </div>
-        <div className="text-center pt-8">
-          <p className="mb-3 text-xl font-semibold text-brand-400">
-            All features, one simple platform.
-          </p>
-          <a href="/signup">
-            <button className="bg-brand-500 text-white px-8 py-3 rounded-full text-lg font-bold shadow hover:bg-brand-600 transition">
-              Try Free Now
-            </button>
-          </a>
-        </div>
+      </nav>
+
+      {/* Subtle grid overlay bg */}
+      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000,transparent)]"></div>
+
+      {/* Centered title and subtitle */}
+      <div className="relative z-10 w-full max-w-2xl mx-auto pt-20 pb-4 text-center">
+        <h1 className="text-6xl font-bold mb-6 text-white/90 tracking-tight">
+          Features
+        </h1>
+        <p className="text-2xl text-gray-400 mb-12">
+          Everything you need to launch a helpful, smart, and brand-matched
+          chatbot in minutes.
+        </p>
+      </div>
+
+      {/* Features Grid */}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 max-w-6xl mx-auto px-6 pb-24">
+        {features.map(({ icon, title, description }) => (
+          <div
+            key={title}
+            className="rounded-2xl border border-gray-800 bg-white/[0.03] p-8 flex flex-col items-start gap-4 hover:bg-white/10 transition shadow-xl min-h-[210px]"
+          >
+            <div className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-xl mb-2">
+              {icon}
+            </div>
+            <h3 className="text-lg font-semibold text-white/90 mb-1">
+              {title}
+            </h3>
+            <p className="text-gray-400 leading-relaxed text-base">
+              {description}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
