@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Switch from "../../components/form/switch/Switch";
+import { getValidToken } from "../../utils/tokenUtils";
 
 const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
 
@@ -26,6 +27,15 @@ interface CrawlResponse {
   message: string;
 }
 
+interface Website {
+  id: number;
+  website_url: string;
+  website_url_pages?: string[];
+  website_url_selected_pages?: string[];
+  created_at?: string;
+  updated_at?: string;
+}
+
 export default function WebsiteUrlManagement() {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [maxPages, setMaxPages] = useState(200);
@@ -34,6 +44,52 @@ export default function WebsiteUrlManagement() {
   const [error, setError] = useState<string | null>(null);
   const [crawlData, setCrawlData] = useState<CrawlResponse | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [savingLoading, setSavingLoading] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
+  const [websites, setWebsites] = useState<Website[]>([]);
+  const [loadingWebsites, setLoadingWebsites] = useState(false);
+  const [websitesError, setWebsitesError] = useState<string | null>(null);
+  const [editingWebsite, setEditingWebsite] = useState<Website | null>(null);
+  const [editWebsiteUrl, setEditWebsiteUrl] = useState("");
+  const [editWebsitePages, setEditWebsitePages] = useState<string[]>([]);
+  const [editSelectedPages, setEditSelectedPages] = useState<string[]>([]);
+  const [updatingWebsite, setUpdatingWebsite] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [deletingWebsiteId, setDeletingWebsiteId] = useState<number | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  async function fetchWebsites() {
+    setLoadingWebsites(true);
+    setWebsitesError(null);
+    try {
+      const token = getValidToken();
+      if (!token) {
+        throw new Error("Not authenticated");
+      }
+      const res = await fetch(`${API_BASE_URL}/websites`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData?.detail || errorData?.message || 'Failed to fetch websites');
+      }
+      
+      const data = await res.json();
+      const list: Website[] = Array.isArray(data) ? data : [data];
+      setWebsites(list);
+    } catch (err: any) {
+      setWebsitesError(err.message || 'An error occurred while fetching websites');
+      console.error('Error fetching websites:', err);
+    } finally {
+      setLoadingWebsites(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchWebsites();
+  }, []);
 
   async function handleCrawl(e: React.FormEvent) {
     e.preventDefault();
@@ -113,6 +169,179 @@ export default function WebsiteUrlManagement() {
     }
     
     setCrawlData(updatedData);
+  };
+
+  const handleContinue = async () => {
+    if (!crawlData) return;
+
+    setSavingLoading(true);
+    setSaveError(null);
+    setSaveSuccess(null);
+
+    try {
+      // Collect all website URLs from all categories
+      const allUrls: string[] = [];
+      crawlData.categories.forEach(category => {
+        category.pages.forEach(page => {
+          allUrls.push(page.url);
+        });
+      });
+
+      // Collect selected pages (only enabled pages)
+      const selectedPages: string[] = [];
+      crawlData.categories.forEach(category => {
+        category.pages.forEach(page => {
+          if (page.enabled) {
+            selectedPages.push(page.url);
+          }
+        });
+      });
+
+      // Create data object
+      const data = {
+        website_url: crawlData.website_url,
+        website_url_pages: allUrls,
+        website_url_selected_pages: selectedPages
+      };
+
+      // Log to console
+      console.log('Website URL Data:', data);
+
+      // Get authentication token
+      const token = getValidToken();
+      if (!token) {
+        throw new Error("Not authenticated. Please login again.");
+      }
+
+      // Make API call to save data
+      const response = await fetch(`${API_BASE_URL}/websites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.detail || errorData?.message || 'Failed to save website data');
+      }
+
+      const responseData = await response.json();
+      setSaveSuccess('Website data saved successfully!');
+      console.log('API Response:', responseData);
+      
+      // Refresh websites list after successful save
+      await fetchWebsites();
+    } catch (err: any) {
+      setSaveError(err.message || 'An error occurred while saving the website data');
+      console.error('Error saving website data:', err);
+    } finally {
+      setSavingLoading(false);
+    }
+  };
+
+  const handleEditClick = (website: Website) => {
+    setEditingWebsite(website);
+    setEditWebsiteUrl(website.website_url);
+    setEditWebsitePages(website.website_url_pages || []);
+    setEditSelectedPages(website.website_url_selected_pages || []);
+    setUpdateError(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingWebsite(null);
+    setEditWebsiteUrl("");
+    setEditWebsitePages([]);
+    setEditSelectedPages([]);
+    setUpdateError(null);
+  };
+
+  const handleUpdateWebsite = async () => {
+    if (!editingWebsite) return;
+
+    setUpdatingWebsite(true);
+    setUpdateError(null);
+
+    try {
+      const token = getValidToken();
+      if (!token) {
+        throw new Error("Not authenticated. Please login again.");
+      }
+
+      const data = {
+        website_url: editWebsiteUrl,
+        website_url_pages: editWebsitePages,
+        website_url_selected_pages: editSelectedPages
+      };
+
+      const response = await fetch(`${API_BASE_URL}/websites/${editingWebsite.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.detail || errorData?.message || 'Failed to update website');
+      }
+
+      const responseData = await response.json();
+      console.log('Update Response:', responseData);
+      
+      // Refresh websites list after successful update
+      await fetchWebsites();
+      handleCancelEdit();
+    } catch (err: any) {
+      setUpdateError(err.message || 'An error occurred while updating the website');
+      console.error('Error updating website:', err);
+    } finally {
+      setUpdatingWebsite(false);
+    }
+  };
+
+  const handleDeleteClick = (websiteId: number) => {
+    setDeleteConfirmId(websiteId);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmId(null);
+  };
+
+  const handleDeleteWebsite = async (websiteId: number) => {
+    setDeletingWebsiteId(websiteId);
+    setDeleteConfirmId(null);
+
+    try {
+      const token = getValidToken();
+      if (!token) {
+        throw new Error("Not authenticated. Please login again.");
+      }
+
+      const response = await fetch(`${API_BASE_URL}/websites/${websiteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.detail || errorData?.message || 'Failed to delete website');
+      }
+
+      // Refresh websites list after successful delete
+      await fetchWebsites();
+    } catch (err: any) {
+      setWebsitesError(err.message || 'An error occurred while deleting the website');
+      console.error('Error deleting website:', err);
+    } finally {
+      setDeletingWebsiteId(null);
+    }
   };
 
   return (
@@ -309,8 +538,241 @@ export default function WebsiteUrlManagement() {
               <p className="text-green-400 text-sm">{crawlData.message}</p>
           </div>
         )}
+
+          {/* Continue Button */}
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={handleContinue}
+              disabled={savingLoading}
+              className="px-6 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {savingLoading ? 'Saving...' : 'Continue'}
+            </button>
+          </div>
+
+          {/* Save Success Message */}
+          {saveSuccess && (
+            <div className="mt-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+              <p className="text-green-400 text-sm">{saveSuccess}</p>
+            </div>
+          )}
+
+          {/* Save Error Message */}
+          {saveError && (
+            <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <p className="text-red-400 text-sm">{saveError}</p>
+            </div>
+          )}
       </div>
       )}
+
+      {/* All Websites List */}
+      <div className="mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-white">All Websites</h2>
+          <button
+            onClick={fetchWebsites}
+            disabled={loadingWebsites}
+            className="px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-sm flex items-center gap-2"
+          >
+            <svg
+              className={`w-4 h-4 ${loadingWebsites ? 'animate-spin' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {loadingWebsites ? 'Loading...' : 'Refresh'}
+          </button>
+        </div>
+
+        {loadingWebsites && websites.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-400">Loading websites...</p>
+          </div>
+        )}
+
+        {websitesError && (
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 mb-4">
+            <p className="text-red-400 text-sm">{websitesError}</p>
+          </div>
+        )}
+
+        {!loadingWebsites && websites.length === 0 && !websitesError && (
+          <div className="text-center py-8">
+            <p className="text-gray-400">No websites found. Crawl and save a website to get started.</p>
+          </div>
+        )}
+
+        {websites.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {websites.map((website) => (
+              <div
+                key={website.id}
+                className="border border-gray-700 rounded-lg p-4 bg-gray-800/50 hover:bg-gray-800 transition-colors"
+              >
+                {editingWebsite?.id === website.id ? (
+                  // Edit Mode
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-300">Website URL</label>
+                      <input
+                        type="url"
+                        value={editWebsiteUrl}
+                        onChange={(e) => setEditWebsiteUrl(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-300">Total Pages: {editWebsitePages.length}</label>
+                      <div className="text-xs text-gray-400 mb-2">
+                        {editWebsitePages.length > 0 ? (
+                          <div className="max-h-32 overflow-y-auto space-y-1">
+                            {editWebsitePages.map((url, idx) => (
+                              <div key={idx} className="truncate">{url}</div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span>No pages</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block mb-2 text-sm text-gray-300">Selected Pages: {editSelectedPages.length}</label>
+                      <div className="text-xs text-gray-400 mb-2">
+                        {editSelectedPages.length > 0 ? (
+                          <div className="max-h-32 overflow-y-auto space-y-1">
+                            {editSelectedPages.map((url, idx) => (
+                              <div key={idx} className="truncate">{url}</div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span>No selected pages</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {updateError && (
+                      <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                        <p className="text-red-400 text-xs">{updateError}</p>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleUpdateWebsite}
+                        disabled={updatingWebsite}
+                        className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {updatingWebsite ? 'Updating...' : 'Save'}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        disabled={updatingWebsite}
+                        className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // View Mode
+                  <>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-semibold mb-2 truncate">Website #{website.id}</h3>
+                        <a
+                          href={website.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-brand-400 text-sm hover:text-brand-300 break-all"
+                        >
+                          {website.website_url}
+                        </a>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 space-y-2 text-xs text-gray-400">
+                      {website.website_url_pages && (
+                        <div>
+                          <span className="font-medium text-gray-300">Total Pages: </span>
+                          <span>{website.website_url_pages.length}</span>
+                        </div>
+                      )}
+                      {website.website_url_selected_pages && (
+                        <div>
+                          <span className="font-medium text-gray-300">Selected Pages: </span>
+                          <span>{website.website_url_selected_pages.length}</span>
+                        </div>
+                      )}
+                      {website.created_at && (
+                        <div>
+                          <span className="font-medium text-gray-300">Created: </span>
+                          <span>{new Date(website.created_at).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => handleEditClick(website)}
+                        disabled={deletingWebsiteId === website.id}
+                        className="flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(website.id)}
+                        disabled={deletingWebsiteId === website.id}
+                        className="flex-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {deletingWebsiteId === website.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirmId && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-gray-700">
+              <h3 className="text-white font-semibold mb-4">Confirm Delete</h3>
+              <p className="text-gray-300 text-sm mb-6">
+                Are you sure you want to delete this website? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleDeleteWebsite(deleteConfirmId)}
+                  disabled={deletingWebsiteId !== null}
+                  className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {deletingWebsiteId === deleteConfirmId ? 'Deleting...' : 'Delete'}
+                </button>
+                <button
+                  onClick={handleCancelDelete}
+                  disabled={deletingWebsiteId !== null}
+                  className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
