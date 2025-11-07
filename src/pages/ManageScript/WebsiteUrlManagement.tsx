@@ -52,8 +52,12 @@ export default function WebsiteUrlManagement() {
   const [websitesError, setWebsitesError] = useState<string | null>(null);
   const [editingWebsite, setEditingWebsite] = useState<Website | null>(null);
   const [editWebsiteUrl, setEditWebsiteUrl] = useState("");
-  const [editWebsitePages, setEditWebsitePages] = useState<string[]>([]);
-  const [editSelectedPages, setEditSelectedPages] = useState<string[]>([]);
+  const [editMaxPages, setEditMaxPages] = useState(200);
+  const [editMaxDepth, setEditMaxDepth] = useState(5);
+  const [editCrawlData, setEditCrawlData] = useState<CrawlResponse | null>(null);
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editExpandedCategories, setEditExpandedCategories] = useState<Set<string>>(new Set());
   const [updatingWebsite, setUpdatingWebsite] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [deletingWebsiteId, setDeletingWebsiteId] = useState<number | null>(null);
@@ -245,36 +249,144 @@ export default function WebsiteUrlManagement() {
   const handleEditClick = (website: Website) => {
     setEditingWebsite(website);
     setEditWebsiteUrl(website.website_url);
-    setEditWebsitePages(website.website_url_pages || []);
-    setEditSelectedPages(website.website_url_selected_pages || []);
+    setEditMaxPages(200);
+    setEditMaxDepth(5);
+    setEditCrawlData(null);
+    setEditError(null);
     setUpdateError(null);
+    setEditExpandedCategories(new Set());
   };
 
   const handleCancelEdit = () => {
     setEditingWebsite(null);
     setEditWebsiteUrl("");
-    setEditWebsitePages([]);
-    setEditSelectedPages([]);
+    setEditMaxPages(200);
+    setEditMaxDepth(5);
+    setEditCrawlData(null);
+    setEditError(null);
     setUpdateError(null);
+    setEditExpandedCategories(new Set());
+  };
+
+  const handleEditCrawl = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditLoading(true);
+    setEditError(null);
+    setEditCrawlData(null);
+    
+    try {
+      const params = new URLSearchParams({
+        website_url: editWebsiteUrl.trim(),
+        max_pages: editMaxPages.toString(),
+        max_depth: editMaxDepth.toString(),
+      });
+
+      const res = await fetch(`${API_BASE_URL}/crawl-website?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData?.detail || errorData?.message || 'Failed to crawl website');
+      }
+
+      const data: CrawlResponse = await res.json();
+      setEditCrawlData(data);
+    } catch (err: any) {
+      setEditError(err.message || 'An error occurred while crawling the website');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleEditCategoryToggle = (categoryIndex: number, enabled: boolean) => {
+    if (!editCrawlData) return;
+    
+    const updatedData = { ...editCrawlData };
+    updatedData.categories[categoryIndex].enabled = enabled;
+    
+    // If disabling category, disable all pages in it
+    if (!enabled) {
+      updatedData.categories[categoryIndex].pages.forEach(page => {
+        page.enabled = false;
+      });
+    }
+    
+    setEditCrawlData(updatedData);
+  };
+
+  const handleEditPageToggle = (categoryIndex: number, pageIndex: number, enabled: boolean) => {
+    if (!editCrawlData) return;
+    
+    const updatedData = { ...editCrawlData };
+    updatedData.categories[categoryIndex].pages[pageIndex].enabled = enabled;
+    
+    // If enabling a page, check if all pages are enabled to enable category
+    // If disabling a page, disable the category
+    const category = updatedData.categories[categoryIndex];
+    if (enabled) {
+      const allPagesEnabled = category.pages.every(p => p.enabled);
+      category.enabled = allPagesEnabled;
+    } else {
+      category.enabled = false;
+    }
+    
+    setEditCrawlData(updatedData);
+  };
+
+  const toggleEditCategory = (categoryName: string) => {
+    const key = categoryName;
+    const newExpanded = new Set(editExpandedCategories);
+    if (newExpanded.has(key)) {
+      newExpanded.delete(key);
+    } else {
+      newExpanded.add(key);
+    }
+    setEditExpandedCategories(newExpanded);
   };
 
   const handleUpdateWebsite = async () => {
-    if (!editingWebsite) return;
+    if (!editingWebsite || !editCrawlData) return;
 
     setUpdatingWebsite(true);
     setUpdateError(null);
 
     try {
+      // Collect all website URLs from all categories
+      const allUrls: string[] = [];
+      editCrawlData.categories.forEach(category => {
+        category.pages.forEach(page => {
+          allUrls.push(page.url);
+        });
+      });
+
+      // Collect selected pages (only enabled pages)
+      const selectedPages: string[] = [];
+      editCrawlData.categories.forEach(category => {
+        category.pages.forEach(page => {
+          if (page.enabled) {
+            selectedPages.push(page.url);
+          }
+        });
+      });
+
+      // Create data object
+      const data = {
+        website_url: editWebsiteUrl,
+        website_url_pages: allUrls,
+        website_url_selected_pages: selectedPages
+      };
+
+      // Log to console
+      console.log('Update Website Data:', data);
+
       const token = getValidToken();
       if (!token) {
         throw new Error("Not authenticated. Please login again.");
       }
-
-      const data = {
-        website_url: editWebsiteUrl,
-        website_url_pages: editWebsitePages,
-        website_url_selected_pages: editSelectedPages
-      };
 
       const response = await fetch(`${API_BASE_URL}/websites/${editingWebsite.id}`, {
         method: 'PUT',
@@ -620,69 +732,191 @@ export default function WebsiteUrlManagement() {
                 {editingWebsite?.id === website.id ? (
                   // Edit Mode
                   <div className="space-y-4">
-                    <div>
-                      <label className="block mb-2 text-sm text-gray-300">Website URL</label>
-                      <input
-                        type="url"
-                        value={editWebsiteUrl}
-                        onChange={(e) => setEditWebsiteUrl(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-                        placeholder="https://example.com"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block mb-2 text-sm text-gray-300">Total Pages: {editWebsitePages.length}</label>
-                      <div className="text-xs text-gray-400 mb-2">
-                        {editWebsitePages.length > 0 ? (
-                          <div className="max-h-32 overflow-y-auto space-y-1">
-                            {editWebsitePages.map((url, idx) => (
-                              <div key={idx} className="truncate">{url}</div>
-                            ))}
+                    {!editCrawlData ? (
+                      // Crawl Form
+                      <form onSubmit={handleEditCrawl} className="space-y-4">
+                        <div>
+                          <label className="block mb-2 text-sm text-gray-300">Website URL</label>
+                          <input
+                            type="url"
+                            value={editWebsiteUrl}
+                            onChange={(e) => setEditWebsiteUrl(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                            placeholder="https://example.com"
+                            required
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block mb-2 text-xs text-gray-300">Max Pages</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={editMaxPages}
+                              onChange={(e) => setEditMaxPages(Number(e.target.value))}
+                              className="w-full px-2 py-1.5 rounded-lg border border-gray-700 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                              required
+                            />
                           </div>
-                        ) : (
-                          <span>No pages</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block mb-2 text-sm text-gray-300">Selected Pages: {editSelectedPages.length}</label>
-                      <div className="text-xs text-gray-400 mb-2">
-                        {editSelectedPages.length > 0 ? (
-                          <div className="max-h-32 overflow-y-auto space-y-1">
-                            {editSelectedPages.map((url, idx) => (
-                              <div key={idx} className="truncate">{url}</div>
-                            ))}
+                          <div>
+                            <label className="block mb-2 text-xs text-gray-300">Max Depth</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={editMaxDepth}
+                              onChange={(e) => setEditMaxDepth(Number(e.target.value))}
+                              className="w-full px-2 py-1.5 rounded-lg border border-gray-700 bg-gray-900 text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                              required
+                            />
                           </div>
-                        ) : (
-                          <span>No selected pages</span>
-                        )}
-                      </div>
-                    </div>
+                        </div>
 
-                    {updateError && (
-                      <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
-                        <p className="text-red-400 text-xs">{updateError}</p>
+                        {editError && (
+                          <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                            <p className="text-red-400 text-xs">{editError}</p>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={editLoading}
+                            className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                          >
+                            {editLoading ? 'Crawling...' : 'Crawl Website'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            disabled={editLoading}
+                            className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      // Page Selection Interface
+                      <div className="space-y-4">
+                        <div className="mb-4">
+                          <p className="text-gray-300 text-xs">
+                            ChatBot classified <strong className="text-white">{editCrawlData.total_pages} pages</strong> on your website into the following categories. 
+                            You can manage categories used in training. If you click on each category, you can decide which category pages should be used to train the bot.
+                          </p>
+                        </div>
+
+                        <div className="space-y-3 max-h-96 overflow-y-auto">
+                          {editCrawlData.categories.map((category, categoryIndex) => {
+                            const isExpanded = editExpandedCategories.has(category.category_name);
+                            return (
+                              <div
+                                key={category.category_name}
+                                className="border border-gray-700 rounded-lg p-3 bg-gray-900/50"
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex-1">
+                                    <h4 className="text-white font-medium text-sm mb-1">{category.category_name}</h4>
+                                    <p className="text-gray-400 text-xs">{category.page_count} pages</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      label=""
+                                      checked={category.enabled}
+                                      onChange={(checked) => handleEditCategoryToggle(categoryIndex, checked)}
+                                      color="blue"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <button
+                                  onClick={() => toggleEditCategory(category.category_name)}
+                                  className="w-full text-left text-xs text-brand-400 hover:text-brand-300 flex items-center gap-1"
+                                >
+                                  <svg
+                                    className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 5l7 7-7 7"
+                                    />
+                                  </svg>
+                                  {isExpanded ? 'Hide pages' : 'Show pages'}
+                                </button>
+
+                                {isExpanded && (
+                                  <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
+                                    {category.pages.map((page, pageIndex) => (
+                                      <div
+                                        key={page.url}
+                                        className="p-2 rounded-lg border border-gray-700 bg-gray-800/50"
+                                      >
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="flex-1 min-w-0">
+                                            <h5 className="text-white text-xs font-medium mb-1 line-clamp-1">
+                                              {page.title}
+                                            </h5>
+                                            {page.description && (
+                                              <p className="text-gray-400 text-xs mb-1 line-clamp-1">
+                                                {page.description}
+                                              </p>
+                                            )}
+                                            <a
+                                              href={page.url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-brand-400 text-xs hover:text-brand-300 truncate block"
+                                            >
+                                              {page.url}
+                                            </a>
+                                          </div>
+                                          <div className="flex-shrink-0">
+                                            <Switch
+                                              label=""
+                                              checked={page.enabled}
+                                              onChange={(checked) => handleEditPageToggle(categoryIndex, pageIndex, checked)}
+                                              color="blue"
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {updateError && (
+                          <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                            <p className="text-red-400 text-xs">{updateError}</p>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 pt-2">
+                          <button
+                            onClick={handleUpdateWebsite}
+                            disabled={updatingWebsite}
+                            className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                          >
+                            {updatingWebsite ? 'Updating...' : 'Save Changes'}
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            disabled={updatingWebsite}
+                            className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
                     )}
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleUpdateWebsite}
-                        disabled={updatingWebsite}
-                        className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {updatingWebsite ? 'Updating...' : 'Save'}
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        disabled={updatingWebsite}
-                        className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        Cancel
-                      </button>
-                    </div>
                   </div>
                 ) : (
                   // View Mode
