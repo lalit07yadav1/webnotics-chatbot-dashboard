@@ -17,6 +17,7 @@ import AllMessages from "./pages/Admin/AllMessages";
 import Profile from "./pages/Profile/Profile";
 import ChangePassword from "./pages/Profile/ChangePassword";
 import UpgradePlanPage from "./pages/Upgrade/UpgradePlanPage";
+import CancelSubscription from "./pages/Upgrade/CancelSubscription";
 // Public Home Pages
 import Overview from "./pages/Home/Overview";
 import About from "./pages/Home/About";
@@ -64,6 +65,7 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/upgrade-plan" element={<UpgradePlanPage />} />
+            <Route path="/cancel-subscription" element={<CancelSubscription />} />
             <Route path="/manage-script/website-urls" element={<WebsiteUrlManagement />} />
             <Route path="/manage-script/faq" element={<FaqManagement />} />
             <Route path="/manage-script/knowledge-base" element={<KnowledgeBaseManagement />} />

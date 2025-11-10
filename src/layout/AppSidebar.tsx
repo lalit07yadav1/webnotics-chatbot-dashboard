@@ -60,6 +60,14 @@ const freeUserNavItems: NavItem[] = [
   },
 ];
 
+const paidUserNavItems: NavItem[] = [
+  {
+    icon: <GridIcon />,
+    name: "Cancel Subscription",
+    path: "/cancel-subscription",
+  },
+];
+
 
 
 const AppSidebar: React.FC = () => {
@@ -99,6 +107,8 @@ const AppSidebar: React.FC = () => {
           setNavItems([...baseNavItems, ...adminNavItems]);
         } else if (data && data.subscription_type === 'free') {
           setNavItems([...baseNavItems, ...freeUserNavItems]);
+        } else if (data && data.subscription_type === 'paid') {
+          setNavItems([...baseNavItems, ...paidUserNavItems]);
         } else {
           setNavItems(baseNavItems);
         }
