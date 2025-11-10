@@ -66,9 +66,14 @@ export default function CancelSubscription() {
     loadProfile();
   }, [navigate]);
 
-  const subscriptionId = useMemo(() => {
+  const subscriptionId = useMemo<string | number | null>(() => {
     if (!profile) return null;
-    return profile.subscription_id ?? profile["stripe_subscription_id"] ?? null;
+    const rawId =
+      profile.subscription_id ?? profile["stripe_subscription_id"] ?? null;
+    if (typeof rawId === "string" || typeof rawId === "number") {
+      return rawId;
+    }
+    return null;
   }, [profile]);
 
   const isPaidUser =
