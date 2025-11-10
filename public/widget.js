@@ -138,6 +138,29 @@
     background_color: "#101828",
     primary_color: "#465fff",
     text_color: "#ffffff",
+    font_family: "Arial, sans-serif",
+    logo_url: "",
+    brand_name: "ChatBot",
+    bot_message_bg: "#1e293b",
+    bot_message_bg_font_size: "16px",
+    bot_message_bg_text_color: "#ffffff",
+    bot_message_user_message: "Hello! How can I help you today?",
+    user_message_bg: "#465fff",
+    user_message_bg_font_size: "16px",
+    user_message_bg_text_color: "#ffffff",
+    user_message_font_family: "Arial, sans-serif",
+    header_bg: "#465fff",
+    header_font_size: "18px",
+    header_text_color: "#ffffff",
+    header_font_family: "Arial, sans-serif",
+    input_bg: "#0f172a",
+    input_text_color: "#ffffff",
+    input_placeholder_text: "Type your message...",
+    input_placeholder_text_color: "#94a3b8",
+    input_placeholder_font_family: "Arial, sans-serif",
+    submit_button_bg: "#465fff",
+    submit_button_color: "#ffffff",
+    submit_button_font_family: "Arial, sans-serif"
   };
   async function loadCustomization() {
     try {
@@ -145,7 +168,6 @@
       if (!res.ok) throw new Error('Failed to load customization');
       const data = await res.json();
       customization = { ...DEFAULT_CUSTOMIZATION, ...data };
-      console.log('customization', customization);
       initChatbot();
     } catch (err) {
       customization = { ...DEFAULT_CUSTOMIZATION };
@@ -183,7 +205,12 @@
  
     const title = document.createElement('h3');
     title.textContent = customization?.brand_name || 'Welcome';
-    title.style.cssText = `margin: 0 0 16px 0; color: ${customization?.text_color || '#000000'};`;
+    title.style.cssText = `
+      margin: 0 0 16px 0;
+      color: ${customization?.header_text_color || customization?.text_color || '#000000'};
+      font-family: ${customization?.header_font_family || customization?.font_family || 'Arial, sans-serif'};
+      font-size: ${customization?.header_font_size || '18px'};
+    `;
  
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
@@ -216,12 +243,12 @@
     submitBtn.style.cssText = `
       width: 100%;
       padding: 12px;
-      background: ${customization?.primary_color || '#0000FF'};
-      color: #FFFFFF;
+      background: ${customization?.submit_button_bg || customization?.primary_color || '#0000FF'};
+      color: ${customization?.submit_button_color || '#FFFFFF'};
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-family: ${customization?.font_family || 'Arial, sans-serif'};
+      font-family: ${customization?.submit_button_font_family || customization?.font_family || 'Arial, sans-serif'};
     `;
  
     submitBtn.onclick = (e) => {
@@ -278,13 +305,14 @@
     // Header
     const header = document.createElement('div');
     header.style.cssText = `
-      background: ${customization.primary_color};
-      color: ${customization.text_color};
+      background: ${customization.header_bg};
+      color: ${customization.header_text_color};
       padding: 16px;
       border-radius: 20px 20px 0 0;
       display: flex;
       align-items: center;
       gap: 12px;
+      font-family: ${customization.header_font_family};
     `;
  
     if (customization.logo_url) {
@@ -297,7 +325,12 @@
  
     const brandName = document.createElement('span');
     brandName.textContent = customization.brand_name;
-    brandName.style.cssText = `font-weight: bold; font-size: 20px;`;
+    brandName.style.cssText = `
+      font-weight: bold;
+      font-size: ${customization.header_font_size};
+      font-family: ${customization.header_font_family};
+      color: ${customization.header_text_color};
+    `;
     header.appendChild(brandName);
  
     const closeBtn = document.createElement('button');
@@ -306,7 +339,7 @@
       margin-left: auto;
       background: none;
       border: none;
-      color: ${customization.text_color};
+      color: ${customization.header_text_color};
       font-size: 30px;
       cursor: pointer;
       line-height: 1;
@@ -325,6 +358,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      font-family: ${customization.font_family};
     `;
  
     // Load chat history only if user info exists (will be loaded in createChatbotUI)
@@ -332,40 +366,57 @@
     // Input area
     const inputArea = document.createElement('div');
     inputArea.style.cssText = `
-      padding: 12px;
-      border-top: 1px solid #ddd;
+      padding: 16px;
+      border-top: 1px solid ${hexWithOpacity(customization.input_text_color, 0.2)};
       display: flex;
       gap: 8px;
+      align-items: center;
+      background: ${customization.input_bg};
     `;
  
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = 'Type your message...';
+    input.placeholder = customization.input_placeholder_text || 'Type your message...';
     input.id = 'webnotics-chat-input';
     input.style.cssText = `
       flex: 1;
       padding: 10px;
-      border: 0;
-      border-radius: 6px;
-      background: transparent;
-      color: ${customization.text_color};
+      border: 1px solid ${hexWithOpacity(customization.input_text_color, 0.2)};
+      border-radius: 10px;
+      background: ${customization.input_bg};
+      color: ${customization.input_text_color};
       font-family: ${customization.font_family};
+      font-size: 16px;
       outline: none;
     `;
  
+    const placeholderStyleId = `webnotics-placeholder-style-${publishKey}`;
+    let placeholderStyle = document.getElementById(placeholderStyleId);
+    if (!placeholderStyle) {
+      placeholderStyle = document.createElement('style');
+      placeholderStyle.id = placeholderStyleId;
+      document.head.appendChild(placeholderStyle);
+    }
+    placeholderStyle.textContent = `
+      #webnotics-chat-input::placeholder {
+        color: ${customization.input_placeholder_text_color};
+        font-family: ${customization.input_placeholder_font_family};
+      }
+    `;
+
     const sendBtn = document.createElement('button');
-    sendBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" height="1em">
-  <path fill="currentColor" d="m3.4 20.4l17.45-7.48a1 1 0 0 0 0-1.84L3.4 3.6a.993.993 0 0 0-1.39.91L2 9.12c0 .5.37.93.87.99L17 12L2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91"/>
-</svg>`;
+    sendBtn.textContent = 'Send';
     sendBtn.style.cssText = `
-      padding: 0;
-      background: transparent;
-      color: ${customization.text_color};
+      padding: 0 20px;
+      background: ${customization.submit_button_bg};
+      color: ${customization.submit_button_color};
       border: none;
-      border-radius: 6px;
+      border-radius: 12px;
       cursor: pointer;
-      font-family: ${customization.font_family};
-      font-size: 30px;
+      font-family: ${customization.submit_button_font_family};
+      font-size: 16px;
+      font-weight: 600;
+      min-width: 80px;
     `;
  
     sendBtn.onclick = () => {
@@ -410,8 +461,8 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: ${customization.primary_color};
-      color: ${customization.text_color};
+      background: ${customization.submit_button_bg};
+      color: ${customization.submit_button_color};
       border: none;
       font-size: 24px;
       cursor: pointer;
@@ -446,6 +497,11 @@
           chatContainer.appendChild(msgEl);
         });
         chatContainer.scrollTop = chatContainer.scrollHeight;
+      } else if (customization.bot_message_user_message) {
+        const welcome = createMessageElement(customization.bot_message_user_message, false);
+        chatContainer.appendChild(welcome);
+        saveChatMessage(customization.bot_message_user_message, false);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
       }
     }
   }
@@ -463,16 +519,23 @@
  
   function createMessageElement(message, isUser) {
     const msgEl = document.createElement('div');
+    const background = isUser ? customization.user_message_bg : customization.bot_message_bg;
+    const textColor = isUser ? customization.user_message_bg_text_color : customization.bot_message_bg_text_color;
+    const fontFamily = isUser ? customization.user_message_font_family : customization.font_family;
+    const fontSize = isUser ? customization.user_message_bg_font_size : customization.bot_message_bg_font_size;
+    const alignment = isUser ? 'margin-left: auto;' : 'margin-right: auto;';
     msgEl.style.cssText = `
-      padding: 10px 14px;
-      border-radius: 20px;
+      padding: 12px 16px;
+      border-radius: 16px;
       max-width: 80%;
       word-wrap: break-word;
-          line-height: 20px;
-      ${isUser
-        ? `background: ${customization.primary_color}; color: ${customization.text_color}; margin-left: auto;`
-        : `background: ${hexWithOpacity(customization.primary_color, 0.5)}; color: ${customization.text_color};`
-      }
+      line-height: 1.5;
+      background: ${background};
+      color: ${textColor};
+      font-family: ${fontFamily};
+      font-size: ${fontSize};
+      ${alignment}
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
     `;
  
     // For bot messages, render HTML; for user messages, escape HTML for security
@@ -523,9 +586,12 @@
     typing.style.cssText = `
       padding: 10px 14px;
       border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      color: ${customization.text_color};
+      background: ${hexWithOpacity(customization.bot_message_bg || customization.primary_color, 0.4)};
+      color: ${customization.bot_message_bg_text_color || customization.text_color};
       font-style: italic;
+      font-family: ${customization.font_family};
+      font-size: ${customization.bot_message_bg_font_size};
+      align-self: flex-start;
     `;
     chatContainer.appendChild(typing);
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -592,6 +658,11 @@
               const msgEl = createMessageElement(msg.message, msg.isUser);
               chatContainer.appendChild(msgEl);
             });
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+          } else if (customization.bot_message_user_message) {
+            const welcome = createMessageElement(customization.bot_message_user_message, false);
+            chatContainer.appendChild(welcome);
+            saveChatMessage(customization.bot_message_user_message, false);
             chatContainer.scrollTop = chatContainer.scrollHeight;
           }
         }

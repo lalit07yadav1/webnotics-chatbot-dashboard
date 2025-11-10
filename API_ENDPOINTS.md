@@ -375,8 +375,33 @@ https://webnotics-chatbot.onrender.com
   ```json
   {
     "website_url": "string",
+    "logo_url": "string",
+    "brand_name": "string",
+    "primary_color": "string",
+    "text_color": "string",
+    "background_color": "string",
+    "font_family": "string",
     "publish_key": "string",
-    // ... other customization fields
+    "bot_message_bg": "string",
+    "bot_message_bg_font_size": "string",
+    "bot_message_bg_text_color": "string",
+    "bot_message_user_message": "string",
+    "user_message_bg": "string",
+    "user_message_bg_font_size": "string",
+    "user_message_bg_text_color": "string",
+    "user_message_font_family": "string",
+    "header_bg": "string",
+    "header_font_size": "string",
+    "header_text_color": "string",
+    "header_font_family": "string",
+    "input_bg": "string",
+    "input_text_color": "string",
+    "input_placeholder_text": "string",
+    "input_placeholder_text_color": "string",
+    "input_placeholder_font_family": "string",
+    "submit_button_bg": "string",
+    "submit_button_color": "string",
+    "submit_button_font_family": "string"
   }
   ```
 - **Used in:** `src/pages/ManageScript/CustomizeChatbot.tsx`
@@ -388,7 +413,39 @@ https://webnotics-chatbot.onrender.com
 - **Headers:** 
   - `Authorization: Bearer {token}`
   - `Content-Type: application/json`
-- **Request Body:** Customization object
+- **Request Body:**
+  ```json
+  {
+    "website_url": "string",
+    "logo_url": "string",
+    "brand_name": "string",
+    "primary_color": "string",
+    "text_color": "string",
+    "background_color": "string",
+    "font_family": "string",
+    "publish_key": "string",
+    "bot_message_bg": "string",
+    "bot_message_bg_font_size": "string",
+    "bot_message_bg_text_color": "string",
+    "bot_message_user_message": "string",
+    "user_message_bg": "string",
+    "user_message_bg_font_size": "string",
+    "user_message_bg_text_color": "string",
+    "user_message_font_family": "string",
+    "header_bg": "string",
+    "header_font_size": "string",
+    "header_text_color": "string",
+    "header_font_family": "string",
+    "input_bg": "string",
+    "input_text_color": "string",
+    "input_placeholder_text": "string",
+    "input_placeholder_text_color": "string",
+    "input_placeholder_font_family": "string",
+    "submit_button_bg": "string",
+    "submit_button_color": "string",
+    "submit_button_font_family": "string"
+  }
+  ```
 - **Used in:** `src/pages/ManageScript/CustomizeChatbot.tsx`
 
 ---
@@ -462,6 +519,7 @@ https://webnotics-chatbot.onrender.com
 **Authentication Required:**
 - All endpoints except `/login` and `/create-account` require Bearer token authentication
 - `/crawl-website` does not require authentication (public endpoint)
+
 
 
 
