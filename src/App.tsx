@@ -26,8 +26,8 @@ import FAQ from "./pages/Home/FAQ";
 import Features from "./pages/Home/Features";
 import Pricing from "./pages/Home/Pricing";
 import PrivacyPolicy from "./pages/Home/PrivacyPolicy";
-import RefundPolicy from "./pages/Home/RefundPolicy";
 import Terms from "./pages/Home/Terms";
+import Integration from "./pages/Home/Integration";
 
 export default function App() {
   return (
@@ -44,9 +44,10 @@ export default function App() {
           <Route path="/home/contact" element={<Contact />} />
           <Route path="/home/faq" element={<FAQ />} />
           <Route path="/home/features" element={<Features />} />
+          <Route path="/home/integration" element={<Integration />} />
           <Route path="/home/pricing" element={<Pricing />} />
           <Route path="/home/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/home/refund-policy" element={<RefundPolicy />} />
+         
           <Route path="/home/terms" element={<Terms />} />
           
           {/* Auth Pages - Redirect to home if already logged in */}

@@ -1,6 +1,6 @@
 import Button from "../../components/ui/button/Button";
 import * as Icons from "../../icons";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 const features = [
   {
@@ -42,6 +42,7 @@ const features = [
 ];
 
 export default function Features() {
+  const navigate = useNavigate();
   return (
     <div className="relative min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
       {/* Header & navigation */}
@@ -61,7 +62,10 @@ export default function Features() {
               ChatBot Pro
             </span>
           </div>
-          <Button className="bg-black text-white font-bold px-6 py-2 rounded-full shadow-lg hover:bg-blue-light-100">
+          <Button
+            className="bg-black text-white font-bold px-6 py-2 rounded-full shadow-lg hover:bg-blue-light-100"
+            onClick={() => navigate('/signup')}
+          >
             Get Started Free →
           </Button>
         </div>
@@ -100,6 +104,139 @@ export default function Features() {
           </div>
         ))}
       </div>
+
+      {/* And Much More Section */}
+      <div className="relative z-10 py-24 max-w-7xl mx-auto px-6">
+        <h2 className="text-6xl font-bold text-center mb-3 text-white/90 tracking-tight">And Much More</h2>
+        <p className="text-2xl text-gray-400 mb-16 text-center font-medium">
+          Powerful features to make your chatbot stand out
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {/* Feature 1 */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 flex items-start gap-4 min-h-[160px] shadow-xl">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white/[0.08] mr-2">
+              <Icons.ConversationIcon className="w-8 h-8 text-gray-200" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-1">Smart Conversations</h3>
+              <p className="text-gray-400 text-base">AI-powered responses that understand context and intent</p>
+            </div>
+          </div>
+          {/* Feature 2 */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 flex items-start gap-4 min-h-[160px] shadow-xl">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white/[0.08] mr-2">
+              <Icons.BoltIcon className="w-8 h-8 text-gray-200" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-1">Lightning Fast</h3>
+              <p className="text-gray-400 text-base">Instant responses with optimized performance</p>
+            </div>
+          </div>
+          {/* Feature 3 */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 flex items-start gap-4 min-h-[160px] shadow-xl">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white/[0.08] mr-2">
+              <Icons.FileIcon className="w-8 h-8 text-gray-200" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-1">Multi-Format Support</h3>
+              <p className="text-gray-400 text-base">Import content from various file formats</p>
+            </div>
+          </div>
+          {/* Feature 4: Advanced Settings (using BoxIcon as substitute) */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 flex items-start gap-4 min-h-[160px] shadow-xl">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white/[0.08] mr-2">
+              <Icons.BoxIcon className="w-8 h-8 text-gray-200" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-1">Advanced Settings</h3>
+              <p className="text-gray-400 text-base">Fine-tune behavior and appearance</p>
+            </div>
+          </div>
+          {/* Feature 5: Flexible Layouts */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 flex items-start gap-4 min-h-[160px] shadow-xl">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white/[0.08] mr-2">
+              <Icons.GridIcon className="w-8 h-8 text-gray-200" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-1">Flexible Layouts</h3>
+              <p className="text-gray-400 text-base">Multiple display options for different use cases</p>
+            </div>
+          </div>
+          {/* Feature 6: Auto-Learning */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-8 flex items-start gap-4 min-h-[160px] shadow-xl">
+            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-white/[0.08] mr-2">
+              <Icons.ShootingStarIcon className="w-8 h-8 text-gray-200" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-1">Auto-Learning</h3>
+              <p className="text-gray-400 text-base">Improves responses based on interactions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Free vs Premium Features Table Section */}
+      <div className="relative z-10 flex justify-center items-center pb-24 px-4">
+        <div className="w-full max-w-4xl bg-white/5 rounded-3xl shadow-2xl border border-white/10 overflow-hidden">
+          <div className="py-10 px-5 md:px-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-white/90">Free vs Premium Features</h2>
+            <div className="divide-y divide-white/10">
+              {/* Table header row */}
+              <div className="grid grid-cols-3 gap-1 py-2 text-gray-400 text-lg font-medium">
+                <div></div>
+                <div className="text-center">Free</div>
+                <div className="text-center">Premium</div>
+              </div>
+              {/* Table rows */}
+              {[
+                { label: 'Visual Chatbot Designer', free: 'check', premium: 'check' },
+                { label: 'Custom Branding', free: '-', premium: 'check' },
+                { label: 'FAQ Builder', free: 'Limited', premium: 'Unlimited' },
+                { label: 'Knowledge Base Upload', free: '-', premium: 'check' },
+                { label: 'Advanced Analytics', free: '-', premium: 'check' },
+                { label: 'Custom CSS/JS', free: '-', premium: 'check' },
+                { label: 'Priority Support', free: '-', premium: 'check' },
+                { label: 'Remove Branding', free: '-', premium: 'check' },
+              ].map(({ label, free, premium }) => (
+                <div key={label} className="grid grid-cols-3 gap-1 py-3 items-center text-base md:text-lg">
+                  <div className="text-left text-white/85 pl-1">{label}</div>
+                  <div className="text-center">
+                    {free === 'check' ? (
+                      <Icons.CheckCircleIcon className="inline w-5 h-5 text-green-500" />
+                    ) : free === '-' ? (
+                      <span className="text-gray-400 text-xl">—</span>
+                    ) : (
+                      <span className="text-gray-400 font-semibold">{free}</span>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    {premium === 'check' ? (
+                      <Icons.CheckCircleIcon className="inline w-5 h-5 text-green-500" />
+                    ) : premium === '-' ? (
+                      <span className="text-gray-400 text-xl">—</span>
+                    ) : (
+                      <span className="font-bold text-white">{premium}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between text-gray-500 text-sm bg-[#0f0f0f] px-8 py-3 border-t border-white/10 rounded-b-3xl">
+            <span>Free Plan</span>
+            <span>Premium Plan</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <footer className="w-full bg-gradient-to-r from-[#0a0a0a] to-[#10131a] px-8 py-5 flex items-center justify-between border-t border-white/5 text-white/80 text-base" style={{boxShadow: '0 -1px 8px 0 rgba(0,0,0,0.2)'}}>
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center"><Icons.ChatIcon className="w-6 h-6 text-black" /></span>
+          <span className="font-semibold text-xl text-white ml-1">ChatBot Pro</span>
+        </div>
+        <span className="text-gray-400 text-base">© 2025 ChatBot Pro. All rights reserved.</span>
+      </footer>
     </div>
   );
 }

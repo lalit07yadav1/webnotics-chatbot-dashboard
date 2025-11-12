@@ -552,6 +552,14 @@ export default function HomePage() {
                     Pricing
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/home/integration"
+                    className="hover:text-white transition"
+                  >
+                    Integration
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -568,7 +576,7 @@ export default function HomePage() {
                 </li>
                 <li>
                   <Link to="/home/faq" className="hover:text-white transition">
-                    FAQ
+                    Documentation
                   </Link>
                 </li>
               </ul>
@@ -601,14 +609,7 @@ export default function HomePage() {
                     Terms
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/home/refund-policy"
-                    className="hover:text-white transition"
-                  >
-                    Refund
-                  </Link>
-                </li>
+                
               </ul>
             </div>
           </div>
