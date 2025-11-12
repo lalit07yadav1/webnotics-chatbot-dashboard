@@ -1,7 +1,69 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
-export default function ChatbotPerformance() {
+interface ChatbotPerformanceChartProps {
+  websites?: Array<{
+    id: number;
+    website_url: string;
+    publish_key: string;
+  }>;
+  messages?: Array<any>;
+}
+
+export default function ChatbotPerformanceChart({ websites = [], messages = [] }: ChatbotPerformanceChartProps) {
+  // Calculate performance per website
+  const getWebsitePerformance = () => {
+    if (!websites || websites.length === 0) {
+      return {
+        categories: ["Support Bot", "Sales Bot", "FAQ Bot", "Welcome Bot"],
+        data: [0, 0, 0, 0],
+      };
+    }
+
+    // Group messages by website
+    const websiteMessageCounts: { [key: string]: number } = {};
+    
+    if (messages && messages.length > 0) {
+      messages.forEach((message: any) => {
+        // Use website_url from message or match by publish_key
+        if (message.website_url) {
+          websiteMessageCounts[message.website_url] = (websiteMessageCounts[message.website_url] || 0) + 1;
+        } else if (message.publish_key) {
+          // Try to match by publish_key if website_url is not available
+          const matchingWebsite = websites.find(w => w.publish_key === message.publish_key);
+          if (matchingWebsite) {
+            websiteMessageCounts[matchingWebsite.website_url] = (websiteMessageCounts[matchingWebsite.website_url] || 0) + 1;
+          }
+        }
+      });
+    }
+
+    // Get top 4 websites or pad with zeros
+    const websiteCounts = websites.map((website) => {
+      const count = websiteMessageCounts[website.website_url] || websiteMessageCounts[website.publish_key] || 0;
+      return { name: website.website_url, count };
+    }).sort((a, b) => b.count - a.count).slice(0, 4);
+
+    // Pad to 4 if needed
+    while (websiteCounts.length < 4) {
+      websiteCounts.push({ name: `Bot ${websiteCounts.length + 1}`, count: 0 });
+    }
+
+    return {
+      categories: websiteCounts.map((w) => {
+        // Extract domain name or use shortened URL
+        try {
+          const url = new URL(w.name);
+          return url.hostname.replace('www.', '') || w.name;
+        } catch {
+          return w.name.length > 20 ? w.name.substring(0, 20) + '...' : w.name;
+        }
+      }),
+      data: websiteCounts.map((w) => w.count),
+    };
+  };
+
+  const performance = getWebsitePerformance();
   const options: ApexOptions = {
     colors: ["#ffffff"],
     chart: {
@@ -29,12 +91,7 @@ export default function ChatbotPerformance() {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: [
-        "Support Bot",
-        "Sales Bot",
-        "FAQ Bot",
-        "Welcome Bot",
-      ],
+      categories: performance.categories,
       axisBorder: {
         show: false,
       },
@@ -75,8 +132,8 @@ export default function ChatbotPerformance() {
   };
   const series = [
     {
-      name: "Sales",
-      data: [168, 385, 201, 298],
+      name: "Messages",
+      data: performance.data,
     },
   ];
 

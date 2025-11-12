@@ -1,7 +1,37 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
 
-export default function ConversationTrendsChart() {
+interface ConversationTrendsChartProps {
+  messages?: Array<any>;
+}
+
+export default function ConversationTrendsChart({ messages = [] }: ConversationTrendsChartProps) {
+  // Process messages to get monthly trends
+  const getMonthlyData = () => {
+    const monthlyCounts: { [key: string]: number } = {
+      Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
+      Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0,
+    };
+
+    if (messages && messages.length > 0) {
+      messages.forEach((message: any) => {
+        const timestamp = message.created_at || message.timestamp;
+        if (timestamp) {
+          const date = new Date(timestamp);
+          const monthIndex = date.getMonth();
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const monthName = monthNames[monthIndex];
+          if (monthlyCounts.hasOwnProperty(monthName)) {
+            monthlyCounts[monthName]++;
+          }
+        }
+      });
+    }
+
+    return Object.values(monthlyCounts);
+  };
+
+  const monthlyData = getMonthlyData();
   const options: ApexOptions = {
     legend: {
       show: false, // Hide legend
@@ -103,7 +133,7 @@ export default function ConversationTrendsChart() {
   const series = [
     {
       name: "Conversation",
-      data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
+      data: monthlyData,
     },
   ];
   return (
