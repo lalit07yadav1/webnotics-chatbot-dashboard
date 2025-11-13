@@ -15,7 +15,7 @@ export default function Integration() {
           <div className="flex items-center gap-3">
             <span
               className="mr-3 cursor-pointer text-gray-400 hover:text-white"
-              onClick={() => navigate("/home")}
+              onClick={() => navigate('/home/overview')}
               tabIndex={0}
               role="button"
               onKeyPress={(e) => {
