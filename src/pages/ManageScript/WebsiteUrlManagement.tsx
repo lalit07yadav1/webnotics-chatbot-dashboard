@@ -30,6 +30,7 @@ interface CrawlResponse {
 interface Website {
   id: number;
   website_url: string;
+  publish_key?: string;
   website_url_pages?: string[];
   website_url_selected_pages?: string[];
   created_at?: string;
@@ -62,6 +63,9 @@ export default function WebsiteUrlManagement() {
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [deletingWebsiteId, setDeletingWebsiteId] = useState<number | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [regeneratingWebsiteId, setRegeneratingWebsiteId] = useState<number | null>(null);
+  const [regenerateError, setRegenerateError] = useState<{ [key: number]: string }>({});
+  const [regenerateSuccess, setRegenerateSuccess] = useState<{ [key: number]: string }>({});
 
   async function fetchWebsites() {
     setLoadingWebsites(true);
@@ -453,6 +457,69 @@ export default function WebsiteUrlManagement() {
       console.error('Error deleting website:', err);
     } finally {
       setDeletingWebsiteId(null);
+    }
+  };
+
+  const handleRegenerateWebsite = async (website: Website) => {
+    if (!website.publish_key) {
+      setRegenerateError({ [website.id]: 'Publish key not available for this website' });
+      return;
+    }
+
+    setRegeneratingWebsiteId(website.id);
+    setRegenerateError(prev => {
+      const newState = { ...prev };
+      delete newState[website.id];
+      return newState;
+    });
+    setRegenerateSuccess(prev => {
+      const newState = { ...prev };
+      delete newState[website.id];
+      return newState;
+    });
+
+    try {
+      const token = getValidToken();
+      if (!token) {
+        throw new Error("Not authenticated. Please login again.");
+      }
+
+      const response = await fetch(`${API_BASE_URL}/regenerate-website-data`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          publish_key: website.publish_key
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.detail || errorData?.message || 'Failed to regenerate website data');
+      }
+
+      const responseData = await response.json();
+      setRegenerateSuccess({ [website.id]: 'Website data regenerated successfully!' });
+      console.log('Regenerate Response:', responseData);
+      
+      // Refresh websites list after successful regenerate
+      await fetchWebsites();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setRegenerateSuccess(prev => {
+          const newState = { ...prev };
+          delete newState[website.id];
+          return newState;
+        });
+      }, 3000);
+    } catch (err: any) {
+      setRegenerateError({ [website.id]: err.message || 'An error occurred while regenerating website data' });
+      console.error('Error regenerating website data:', err);
+    } finally {
+      setRegeneratingWebsiteId(null);
     }
   };
 
@@ -956,21 +1023,74 @@ export default function WebsiteUrlManagement() {
                       )}
                     </div>
 
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-4 flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditClick(website)}
+                          disabled={deletingWebsiteId === website.id || regeneratingWebsiteId === website.id}
+                          className="flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(website.id)}
+                          disabled={deletingWebsiteId === website.id || regeneratingWebsiteId === website.id}
+                          className="flex-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          {deletingWebsiteId === website.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
                       <button
-                        onClick={() => handleEditClick(website)}
-                        disabled={deletingWebsiteId === website.id}
-                        className="flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        onClick={() => handleRegenerateWebsite(website)}
+                        disabled={!website.publish_key || deletingWebsiteId === website.id || regeneratingWebsiteId === website.id}
+                        className="w-full px-3 py-1.5 rounded-lg bg-green-600 text-white text-xs hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        Edit
+                        {regeneratingWebsiteId === website.id ? (
+                          <>
+                            <svg
+                              className="w-3 h-3 animate-spin"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                            Regenerating...
+                          </>
+                        ) : (
+                          <>
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                            Regenerate Website Content
+                          </>
+                        )}
                       </button>
-                      <button
-                        onClick={() => handleDeleteClick(website.id)}
-                        disabled={deletingWebsiteId === website.id}
-                        className="flex-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {deletingWebsiteId === website.id ? 'Deleting...' : 'Delete'}
-                      </button>
+                      {regenerateError[website.id] && (
+                        <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                          <p className="text-red-400 text-xs">{regenerateError[website.id]}</p>
+                        </div>
+                      )}
+                      {regenerateSuccess[website.id] && (
+                        <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
+                          <p className="text-green-400 text-xs">{regenerateSuccess[website.id]}</p>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
