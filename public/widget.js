@@ -140,11 +140,11 @@
     text_color: "#ffffff",
     font_family: "Arial, sans-serif",
     logo_url: "",
-    brand_name: "ChatBot",
+    brand_name: "AI assistant",
     bot_message_bg: "#1e293b",
     bot_message_bg_font_size: "16px",
     bot_message_bg_text_color: "#ffffff",
-    bot_message_user_message: "Hello! How can I help you today?",
+    bot_message_user_message: "Hello! Welcome! How can I help you today?",
     user_message_bg: "#465fff",
     user_message_bg_font_size: "16px",
     user_message_bg_text_color: "#ffffff",
@@ -318,18 +318,22 @@
     if (customization.logo_url) {
       const logo = document.createElement('img');
       logo.src = customization.logo_url;
-      logo.alt = customization.brand_name;
-      logo.style.cssText = 'width: 32px; height: 32px; border-radius: 50%; object-fit: cover;';
+      logo.alt = customization.brand_name || 'AI assistant';
+      logo.style.cssText = 'max-width: 32px; max-height: 32px; width: auto; height: auto; border-radius: 50%; object-fit: cover; flex-shrink: 0;';
+      logo.onerror = function() {
+        this.style.display = 'none';
+      };
       header.appendChild(logo);
     }
  
     const brandName = document.createElement('span');
-    brandName.textContent = customization.brand_name;
+    brandName.textContent = customization.brand_name || 'AI assistant';
     brandName.style.cssText = `
       font-weight: bold;
       font-size: ${customization.header_font_size};
       font-family: ${customization.header_font_family};
       color: ${customization.header_text_color};
+      flex: 1;
     `;
     header.appendChild(brandName);
  
@@ -366,30 +370,31 @@
     // Input area
     const inputArea = document.createElement('div');
     inputArea.style.cssText = `
-      padding: 16px;
-      border-top: 1px solid ${hexWithOpacity(customization.input_text_color, 0.2)};
+      padding: 12px 16px;
+      border-top: 1px solid ${hexWithOpacity(customization.input_text_color, 0.15)};
       display: flex;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
       background: ${customization.input_bg};
     `;
- 
+
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = customization.input_placeholder_text || 'Type your message...';
     input.id = 'webnotics-chat-input';
     input.style.cssText = `
       flex: 1;
-      padding: 10px;
+      padding: 12px 16px;
       border: 1px solid ${hexWithOpacity(customization.input_text_color, 0.2)};
-      border-radius: 10px;
+      border-radius: 24px;
       background: ${customization.input_bg};
       color: ${customization.input_text_color};
-      font-family: ${customization.font_family};
-      font-size: 16px;
+      font-family: ${customization.input_placeholder_font_family || customization.font_family};
+      font-size: 14px;
       outline: none;
+      min-width: 0;
     `;
- 
+
     const placeholderStyleId = `webnotics-placeholder-style-${publishKey}`;
     let placeholderStyle = document.getElementById(placeholderStyleId);
     if (!placeholderStyle) {
@@ -400,23 +405,26 @@
     placeholderStyle.textContent = `
       #webnotics-chat-input::placeholder {
         color: ${customization.input_placeholder_text_color};
-        font-family: ${customization.input_placeholder_font_family};
+        font-family: ${customization.input_placeholder_font_family || customization.font_family};
+        opacity: 0.7;
       }
     `;
 
     const sendBtn = document.createElement('button');
     sendBtn.textContent = 'Send';
     sendBtn.style.cssText = `
-      padding: 0 20px;
+      padding: 12px 24px;
       background: ${customization.submit_button_bg};
       color: ${customization.submit_button_color};
       border: none;
-      border-radius: 12px;
+      border-radius: 24px;
       cursor: pointer;
-      font-family: ${customization.submit_button_font_family};
-      font-size: 16px;
+      font-family: ${customization.submit_button_font_family || customization.font_family};
+      font-size: 14px;
       font-weight: 600;
-      min-width: 80px;
+      white-space: nowrap;
+      height: 44px;
+      flex-shrink: 0;
     `;
  
     sendBtn.onclick = () => {

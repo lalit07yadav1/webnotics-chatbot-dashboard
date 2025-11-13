@@ -1,10 +1,44 @@
 import { useEffect, useState } from "react";
+import ChatbotPreview from "../../components/ChatbotPreview";
 
 interface Website {
   id: number;
   website_url: string;
   publish_key: string;
 }
+
+// Browser-supported font families
+const FONT_FAMILIES = [
+  { value: "Arial, sans-serif", label: "Arial" },
+  { value: "Helvetica, sans-serif", label: "Helvetica" },
+  { value: "Times New Roman, serif", label: "Times New Roman" },
+  { value: "Georgia, serif", label: "Georgia" },
+  { value: "Courier New, monospace", label: "Courier New" },
+  { value: "Verdana, sans-serif", label: "Verdana" },
+  { value: "Tahoma, sans-serif", label: "Tahoma" },
+  { value: "Trebuchet MS, sans-serif", label: "Trebuchet MS" },
+  { value: "Impact, sans-serif", label: "Impact" },
+  { value: "Comic Sans MS, cursive", label: "Comic Sans MS" },
+  { value: "Lucida Console, monospace", label: "Lucida Console" },
+  { value: "Lucida Sans Unicode, sans-serif", label: "Lucida Sans Unicode" },
+  { value: "Palatino Linotype, serif", label: "Palatino Linotype" },
+  { value: "Garamond, serif", label: "Garamond" },
+  { value: "Book Antiqua, serif", label: "Book Antiqua" },
+  { value: "Roboto, sans-serif", label: "Roboto" },
+  { value: "Montserrat, sans-serif", label: "Montserrat" },
+  { value: "Lato, sans-serif", label: "Lato" },
+  { value: "Open Sans, sans-serif", label: "Open Sans" },
+  { value: "Poppins, sans-serif", label: "Poppins" },
+  { value: "Raleway, sans-serif", label: "Raleway" },
+  { value: "Ubuntu, sans-serif", label: "Ubuntu" },
+  { value: "Playfair Display, serif", label: "Playfair Display" },
+  { value: "Merriweather, serif", label: "Merriweather" },
+  { value: "Source Sans Pro, sans-serif", label: "Source Sans Pro" },
+  { value: "Oswald, sans-serif", label: "Oswald" },
+  { value: "PT Sans, sans-serif", label: "PT Sans" },
+  { value: "Droid Sans, sans-serif", label: "Droid Sans" },
+  { value: "system-ui, -apple-system, sans-serif", label: "System UI" },
+];
 
 interface Customization {
   id: string;
@@ -46,7 +80,7 @@ export default function CustomizeChatbot() {
   const [websites, setWebsites] = useState<Website[]>([]);
   const [selectedWebsiteId, setSelectedWebsiteId] = useState<number | null>(null);
   const [logoUrl, setLogoUrl] = useState("");
-  const [brandName, setBrandName] = useState("");
+  const [brandName, setBrandName] = useState("AI assistant");
   const [primaryColor, setPrimaryColor] = useState("#0000FF");
   const [textColor, setTextColor] = useState("#000000");
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
@@ -54,7 +88,7 @@ export default function CustomizeChatbot() {
   const [botMessageBg, setBotMessageBg] = useState("#FFFFFF");
   const [botMessageBgFontSize, setBotMessageBgFontSize] = useState("16px");
   const [botMessageBgTextColor, setBotMessageBgTextColor] = useState("#000000");
-  const [botMessageUserMessage, setBotMessageUserMessage] = useState("Thanks for reaching out!");
+  const [botMessageUserMessage, setBotMessageUserMessage] = useState("Hello! Welcome! How can I help you today?");
   const [userMessageBg, setUserMessageBg] = useState("#EEEEEE");
   const [userMessageBgFontSize, setUserMessageBgFontSize] = useState("14px");
   const [userMessageBgTextColor, setUserMessageBgTextColor] = useState("#000000");
@@ -87,7 +121,7 @@ export default function CustomizeChatbot() {
   const [editBotMessageBg, setEditBotMessageBg] = useState("#FFFFFF");
   const [editBotMessageBgFontSize, setEditBotMessageBgFontSize] = useState("16px");
   const [editBotMessageBgTextColor, setEditBotMessageBgTextColor] = useState("#000000");
-  const [editBotMessageUserMessage, setEditBotMessageUserMessage] = useState("Thanks for reaching out!");
+  const [editBotMessageUserMessage, setEditBotMessageUserMessage] = useState("Hello! Welcome! How can I help you today?");
   const [editUserMessageBg, setEditUserMessageBg] = useState("#EEEEEE");
   const [editUserMessageBgFontSize, setEditUserMessageBgFontSize] = useState("14px");
   const [editUserMessageBgTextColor, setEditUserMessageBgTextColor] = useState("#000000");
@@ -256,7 +290,7 @@ export default function CustomizeChatbot() {
       setBotMessageBg("#FFFFFF");
       setBotMessageBgFontSize("16px");
       setBotMessageBgTextColor("#000000");
-      setBotMessageUserMessage("Thanks for reaching out!");
+      setBotMessageUserMessage("Hello! Welcome! How can I help you today?");
       setUserMessageBg("#EEEEEE");
       setUserMessageBgFontSize("14px");
       setUserMessageBgTextColor("#000000");
@@ -383,7 +417,9 @@ export default function CustomizeChatbot() {
     <div className="p-4 sm:p-6">
       <h1 className="mb-4 text-xl font-semibold text-white">Customize Chatbot</h1>
 
-      <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Form Section */}
+        <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-2 text-sm text-gray-300">Website URL</label>
           <select
@@ -497,27 +533,31 @@ export default function CustomizeChatbot() {
             onChange={(e) => setFontFamily(e.target.value)}
             required
           >
-            <option value="Arial, sans-serif">Arial</option>
-            <option value="Helvetica, sans-serif">Helvetica</option>
-            <option value="Times New Roman, serif">Times New Roman</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="Courier New, monospace">Courier New</option>
-            <option value="Verdana, sans-serif">Verdana</option>
-            <option value="Roboto, sans-serif">Roboto</option>
-            <option value="Montserrat, sans-serif">Montserrat</option>
-            <option value="Lato, sans-serif">Lato</option>
+            {FONT_FAMILIES.map((font) => (
+              <option key={font.value} value={font.value}>
+                {font.label}
+              </option>
+            ))}
           </select>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Bot Message Background</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={botMessageBg}
-              onChange={(e) => setBotMessageBg(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={botMessageBg}
+                onChange={(e) => setBotMessageBg(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={botMessageBg}
+                onChange={(e) => setBotMessageBg(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Bot Message Font Size</label>
@@ -533,12 +573,20 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Bot Message Text Color</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={botMessageBgTextColor}
-              onChange={(e) => setBotMessageBgTextColor(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={botMessageBgTextColor}
+                onChange={(e) => setBotMessageBgTextColor(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={botMessageBgTextColor}
+                onChange={(e) => setBotMessageBgTextColor(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Default Bot Message</label>
@@ -554,12 +602,20 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">User Message Background</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={userMessageBg}
-              onChange={(e) => setUserMessageBg(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={userMessageBg}
+                onChange={(e) => setUserMessageBg(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={userMessageBg}
+                onChange={(e) => setUserMessageBg(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">User Message Font Size</label>
@@ -575,12 +631,20 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">User Message Text Color</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={userMessageBgTextColor}
-              onChange={(e) => setUserMessageBgTextColor(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={userMessageBgTextColor}
+                onChange={(e) => setUserMessageBgTextColor(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={userMessageBgTextColor}
+                onChange={(e) => setUserMessageBgTextColor(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">User Message Font Family</label>
@@ -589,15 +653,11 @@ export default function CustomizeChatbot() {
               value={userMessageFontFamily}
               onChange={(e) => setUserMessageFontFamily(e.target.value)}
             >
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="Helvetica, sans-serif">Helvetica</option>
-              <option value="Times New Roman, serif">Times New Roman</option>
-              <option value="Georgia, serif">Georgia</option>
-              <option value="Courier New, monospace">Courier New</option>
-              <option value="Verdana, sans-serif">Verdana</option>
-              <option value="Roboto, sans-serif">Roboto</option>
-              <option value="Montserrat, sans-serif">Montserrat</option>
-              <option value="Lato, sans-serif">Lato</option>
+              {FONT_FAMILIES.map((font) => (
+                <option key={font.value} value={font.value}>
+                  {font.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -605,12 +665,20 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Header Background</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={headerBg}
-              onChange={(e) => setHeaderBg(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={headerBg}
+                onChange={(e) => setHeaderBg(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={headerBg}
+                onChange={(e) => setHeaderBg(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Header Font Size</label>
@@ -626,12 +694,20 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Header Text Color</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={headerTextColor}
-              onChange={(e) => setHeaderTextColor(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={headerTextColor}
+                onChange={(e) => setHeaderTextColor(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={headerTextColor}
+                onChange={(e) => setHeaderTextColor(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Header Font Family</label>
@@ -640,15 +716,11 @@ export default function CustomizeChatbot() {
               value={headerFontFamily}
               onChange={(e) => setHeaderFontFamily(e.target.value)}
             >
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="Helvetica, sans-serif">Helvetica</option>
-              <option value="Times New Roman, serif">Times New Roman</option>
-              <option value="Georgia, serif">Georgia</option>
-              <option value="Courier New, monospace">Courier New</option>
-              <option value="Verdana, sans-serif">Verdana</option>
-              <option value="Roboto, sans-serif">Roboto</option>
-              <option value="Montserrat, sans-serif">Montserrat</option>
-              <option value="Lato, sans-serif">Lato</option>
+              {FONT_FAMILIES.map((font) => (
+                <option key={font.value} value={font.value}>
+                  {font.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -656,21 +728,37 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Input Background</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={inputBg}
-              onChange={(e) => setInputBg(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={inputBg}
+                onChange={(e) => setInputBg(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={inputBg}
+                onChange={(e) => setInputBg(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Input Text Color</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={inputTextColor}
-              onChange={(e) => setInputTextColor(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={inputTextColor}
+                onChange={(e) => setInputTextColor(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={inputTextColor}
+                onChange={(e) => setInputTextColor(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -687,12 +775,20 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Input Placeholder Text Color</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={inputPlaceholderTextColor}
-              onChange={(e) => setInputPlaceholderTextColor(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={inputPlaceholderTextColor}
+                onChange={(e) => setInputPlaceholderTextColor(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={inputPlaceholderTextColor}
+                onChange={(e) => setInputPlaceholderTextColor(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Input Placeholder Font Family</label>
@@ -701,15 +797,11 @@ export default function CustomizeChatbot() {
               value={inputPlaceholderFontFamily}
               onChange={(e) => setInputPlaceholderFontFamily(e.target.value)}
             >
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="Helvetica, sans-serif">Helvetica</option>
-              <option value="Times New Roman, serif">Times New Roman</option>
-              <option value="Georgia, serif">Georgia</option>
-              <option value="Courier New, monospace">Courier New</option>
-              <option value="Verdana, sans-serif">Verdana</option>
-              <option value="Roboto, sans-serif">Roboto</option>
-              <option value="Montserrat, sans-serif">Montserrat</option>
-              <option value="Lato, sans-serif">Lato</option>
+              {FONT_FAMILIES.map((font) => (
+                <option key={font.value} value={font.value}>
+                  {font.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -717,21 +809,37 @@ export default function CustomizeChatbot() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block mb-2 text-sm text-gray-300">Submit Button Background</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={submitButtonBg}
-              onChange={(e) => setSubmitButtonBg(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={submitButtonBg}
+                onChange={(e) => setSubmitButtonBg(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={submitButtonBg}
+                onChange={(e) => setSubmitButtonBg(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-sm text-gray-300">Submit Button Text Color</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-              value={submitButtonColor}
-              onChange={(e) => setSubmitButtonColor(e.target.value)}
-            />
+            <div className="flex gap-2">
+              <input
+                type="color"
+                className="h-10 w-20 border border-gray-700 rounded"
+                value={submitButtonColor}
+                onChange={(e) => setSubmitButtonColor(e.target.value)}
+              />
+              <input
+                type="text"
+                className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                value={submitButtonColor}
+                onChange={(e) => setSubmitButtonColor(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -742,15 +850,11 @@ export default function CustomizeChatbot() {
             value={submitButtonFontFamily}
             onChange={(e) => setSubmitButtonFontFamily(e.target.value)}
           >
-            <option value="Arial, sans-serif">Arial</option>
-            <option value="Helvetica, sans-serif">Helvetica</option>
-            <option value="Times New Roman, serif">Times New Roman</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="Courier New, monospace">Courier New</option>
-            <option value="Verdana, sans-serif">Verdana</option>
-            <option value="Roboto, sans-serif">Roboto</option>
-            <option value="Montserrat, sans-serif">Montserrat</option>
-            <option value="Lato, sans-serif">Lato</option>
+            {FONT_FAMILIES.map((font) => (
+              <option key={font.value} value={font.value}>
+                {font.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -764,6 +868,39 @@ export default function CustomizeChatbot() {
         {message && <p className="text-green-500 text-sm">{message}</p>}
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </form>
+
+      {/* Preview Section */}
+      <div className="lg:sticky lg:top-4 h-fit">
+        <ChatbotPreview
+          logoUrl={logoUrl}
+          brandName={brandName}
+          primaryColor={primaryColor}
+          textColor={textColor}
+          backgroundColor={backgroundColor}
+          fontFamily={fontFamily}
+          botMessageBg={botMessageBg}
+          botMessageBgFontSize={botMessageBgFontSize}
+          botMessageBgTextColor={botMessageBgTextColor}
+          botMessageUserMessage={botMessageUserMessage}
+          userMessageBg={userMessageBg}
+          userMessageBgFontSize={userMessageBgFontSize}
+          userMessageBgTextColor={userMessageBgTextColor}
+          userMessageFontFamily={userMessageFontFamily}
+          headerBg={headerBg}
+          headerFontSize={headerFontSize}
+          headerTextColor={headerTextColor}
+          headerFontFamily={headerFontFamily}
+          inputBg={inputBg}
+          inputTextColor={inputTextColor}
+          inputPlaceholderText={inputPlaceholderText}
+          inputPlaceholderTextColor={inputPlaceholderTextColor}
+          inputPlaceholderFontFamily={inputPlaceholderFontFamily}
+          submitButtonBg={submitButtonBg}
+          submitButtonColor={submitButtonColor}
+          submitButtonFontFamily={submitButtonFontFamily}
+        />
+      </div>
+      </div>
 
       <div className="mt-8">
         <h2 className="mb-4 text-lg font-semibold text-white">Existing Customizations</h2>
@@ -856,24 +993,30 @@ export default function CustomizeChatbot() {
                         value={editFontFamily}
                         onChange={(e) => setEditFontFamily(e.target.value)}
                       >
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="Helvetica, sans-serif">Helvetica</option>
-                        <option value="Times New Roman, serif">Times New Roman</option>
-                        <option value="Georgia, serif">Georgia</option>
-                        <option value="Courier New, monospace">Courier New</option>
-                        <option value="Verdana, sans-serif">Verdana</option>
-                        <option value="Roboto, sans-serif">Roboto</option>
+                        {FONT_FAMILIES.map((font) => (
+                          <option key={font.value} value={font.value}>
+                            {font.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Bot Message Background</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editBotMessageBg}
-                          onChange={(e) => setEditBotMessageBg(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editBotMessageBg}
+                            onChange={(e) => setEditBotMessageBg(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editBotMessageBg}
+                            onChange={(e) => setEditBotMessageBg(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Bot Message Font Size</label>
@@ -888,12 +1031,20 @@ export default function CustomizeChatbot() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Bot Message Text Color</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editBotMessageBgTextColor}
-                          onChange={(e) => setEditBotMessageBgTextColor(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editBotMessageBgTextColor}
+                            onChange={(e) => setEditBotMessageBgTextColor(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editBotMessageBgTextColor}
+                            onChange={(e) => setEditBotMessageBgTextColor(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Default Bot Message</label>
@@ -908,12 +1059,20 @@ export default function CustomizeChatbot() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">User Message Background</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editUserMessageBg}
-                          onChange={(e) => setEditUserMessageBg(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editUserMessageBg}
+                            onChange={(e) => setEditUserMessageBg(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editUserMessageBg}
+                            onChange={(e) => setEditUserMessageBg(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">User Message Font Size</label>
@@ -928,12 +1087,20 @@ export default function CustomizeChatbot() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">User Message Text Color</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editUserMessageBgTextColor}
-                          onChange={(e) => setEditUserMessageBgTextColor(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editUserMessageBgTextColor}
+                            onChange={(e) => setEditUserMessageBgTextColor(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editUserMessageBgTextColor}
+                            onChange={(e) => setEditUserMessageBgTextColor(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">User Message Font Family</label>
@@ -942,27 +1109,31 @@ export default function CustomizeChatbot() {
                           value={editUserMessageFontFamily}
                           onChange={(e) => setEditUserMessageFontFamily(e.target.value)}
                         >
-                          <option value="Arial, sans-serif">Arial</option>
-                          <option value="Helvetica, sans-serif">Helvetica</option>
-                          <option value="Times New Roman, serif">Times New Roman</option>
-                          <option value="Georgia, serif">Georgia</option>
-                          <option value="Courier New, monospace">Courier New</option>
-                          <option value="Verdana, sans-serif">Verdana</option>
-                          <option value="Roboto, sans-serif">Roboto</option>
-                          <option value="Montserrat, sans-serif">Montserrat</option>
-                          <option value="Lato, sans-serif">Lato</option>
+                          {FONT_FAMILIES.map((font) => (
+                            <option key={font.value} value={font.value}>
+                              {font.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Header Background</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editHeaderBg}
-                          onChange={(e) => setEditHeaderBg(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editHeaderBg}
+                            onChange={(e) => setEditHeaderBg(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editHeaderBg}
+                            onChange={(e) => setEditHeaderBg(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Header Font Size</label>
@@ -977,12 +1148,20 @@ export default function CustomizeChatbot() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Header Text Color</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editHeaderTextColor}
-                          onChange={(e) => setEditHeaderTextColor(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editHeaderTextColor}
+                            onChange={(e) => setEditHeaderTextColor(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editHeaderTextColor}
+                            onChange={(e) => setEditHeaderTextColor(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Header Font Family</label>
@@ -991,36 +1170,48 @@ export default function CustomizeChatbot() {
                           value={editHeaderFontFamily}
                           onChange={(e) => setEditHeaderFontFamily(e.target.value)}
                         >
-                          <option value="Arial, sans-serif">Arial</option>
-                          <option value="Helvetica, sans-serif">Helvetica</option>
-                          <option value="Times New Roman, serif">Times New Roman</option>
-                          <option value="Georgia, serif">Georgia</option>
-                          <option value="Courier New, monospace">Courier New</option>
-                          <option value="Verdana, sans-serif">Verdana</option>
-                          <option value="Roboto, sans-serif">Roboto</option>
-                          <option value="Montserrat, sans-serif">Montserrat</option>
-                          <option value="Lato, sans-serif">Lato</option>
+                          {FONT_FAMILIES.map((font) => (
+                            <option key={font.value} value={font.value}>
+                              {font.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Input Background</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editInputBg}
-                          onChange={(e) => setEditInputBg(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editInputBg}
+                            onChange={(e) => setEditInputBg(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editInputBg}
+                            onChange={(e) => setEditInputBg(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Input Text Color</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editInputTextColor}
-                          onChange={(e) => setEditInputTextColor(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editInputTextColor}
+                            onChange={(e) => setEditInputTextColor(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editInputTextColor}
+                            onChange={(e) => setEditInputTextColor(e.target.value)}
+                          />
+                        </div>
                       </div>
                     </div>
                     <div>
@@ -1035,12 +1226,20 @@ export default function CustomizeChatbot() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Input Placeholder Text Color</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editInputPlaceholderTextColor}
-                          onChange={(e) => setEditInputPlaceholderTextColor(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editInputPlaceholderTextColor}
+                            onChange={(e) => setEditInputPlaceholderTextColor(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editInputPlaceholderTextColor}
+                            onChange={(e) => setEditInputPlaceholderTextColor(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Input Placeholder Font Family</label>
@@ -1049,36 +1248,48 @@ export default function CustomizeChatbot() {
                           value={editInputPlaceholderFontFamily}
                           onChange={(e) => setEditInputPlaceholderFontFamily(e.target.value)}
                         >
-                          <option value="Arial, sans-serif">Arial</option>
-                          <option value="Helvetica, sans-serif">Helvetica</option>
-                          <option value="Times New Roman, serif">Times New Roman</option>
-                          <option value="Georgia, serif">Georgia</option>
-                          <option value="Courier New, monospace">Courier New</option>
-                          <option value="Verdana, sans-serif">Verdana</option>
-                          <option value="Roboto, sans-serif">Roboto</option>
-                          <option value="Montserrat, sans-serif">Montserrat</option>
-                          <option value="Lato, sans-serif">Lato</option>
+                          {FONT_FAMILIES.map((font) => (
+                            <option key={font.value} value={font.value}>
+                              {font.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Submit Button Background</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editSubmitButtonBg}
-                          onChange={(e) => setEditSubmitButtonBg(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editSubmitButtonBg}
+                            onChange={(e) => setEditSubmitButtonBg(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editSubmitButtonBg}
+                            onChange={(e) => setEditSubmitButtonBg(e.target.value)}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block mb-2 text-sm text-gray-300">Submit Button Text Color</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
-                          value={editSubmitButtonColor}
-                          onChange={(e) => setEditSubmitButtonColor(e.target.value)}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="color"
+                            className="h-10 w-20 border border-gray-700 rounded"
+                            value={editSubmitButtonColor}
+                            onChange={(e) => setEditSubmitButtonColor(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="flex-1 px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
+                            value={editSubmitButtonColor}
+                            onChange={(e) => setEditSubmitButtonColor(e.target.value)}
+                          />
+                        </div>
                       </div>
                     </div>
                     <div>
@@ -1088,15 +1299,11 @@ export default function CustomizeChatbot() {
                         value={editSubmitButtonFontFamily}
                         onChange={(e) => setEditSubmitButtonFontFamily(e.target.value)}
                       >
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="Helvetica, sans-serif">Helvetica</option>
-                        <option value="Times New Roman, serif">Times New Roman</option>
-                        <option value="Georgia, serif">Georgia</option>
-                        <option value="Courier New, monospace">Courier New</option>
-                        <option value="Verdana, sans-serif">Verdana</option>
-                        <option value="Roboto, sans-serif">Roboto</option>
-                        <option value="Montserrat, sans-serif">Montserrat</option>
-                        <option value="Lato, sans-serif">Lato</option>
+                        {FONT_FAMILIES.map((font) => (
+                          <option key={font.value} value={font.value}>
+                            {font.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="flex gap-2">
