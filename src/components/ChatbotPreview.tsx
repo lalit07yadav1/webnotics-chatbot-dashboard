@@ -30,8 +30,8 @@ interface ChatbotPreviewProps {
 export default function ChatbotPreview({
   logoUrl,
   brandName,
-  primaryColor,
-  textColor,
+  primaryColor: _primaryColor,
+  textColor: _textColor,
   backgroundColor,
   fontFamily,
   botMessageBg,
