@@ -50,6 +50,11 @@ const adminNavItems: NavItem[] = [
     name: "All Messages",
     path: "/admin-messages",
   },
+  {
+    icon: <GridIcon />,
+    name: "Settings",
+    path: "/admin-settings",
+  },
 ];
 
 const freeUserNavItems: NavItem[] = [
