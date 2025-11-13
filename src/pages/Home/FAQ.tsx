@@ -65,7 +65,7 @@ export default function FAQ() {
         <div className="w-full max-w-6xl mx-auto mt-8">
           <h3 className="text-2xl md:text-2xl font-bold text-white mb-7 pl-2">Popular Articles</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-7">
-            {docs.map((d, i) => (
+            {docs.map((d) => (
               <div key={d.title} className="rounded-2xl bg-white/5 border border-white/10 shadow-md p-7 flex flex-col gap-2 min-h-[120px] hover:bg-white/10 transition relative">
                 <div className="flex items-center gap-3 mb-2">
                   <Icons.PageIcon className="w-6 h-6 text-white/80 flex-shrink-0" />

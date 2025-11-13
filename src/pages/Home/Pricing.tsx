@@ -1,7 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import { useNavigate } from 'react-router';
 import * as Icons from '../../icons';
-import AppHeader from '../../layout/AppHeader';
 
 export default function Pricing() {
   const navigate = useNavigate();

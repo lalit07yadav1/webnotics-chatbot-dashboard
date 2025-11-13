@@ -169,7 +169,7 @@ export default function Contact() {
               q: 'How do I upgrade or downgrade my plan?',
               a: 'Go to your dashboard settings and select "Billing" to manage your subscription plan at any time.',
             },
-          ].map((faq, i) => (
+          ].map((faq) => (
             <div key={faq.q} className="bg-[#18191b] rounded-2xl border border-white/10 px-7 py-6 flex flex-col gap-1 shadow-xl">
               <div className="flex items-start mb-1">
                 {/* Info icon (question) */}
