@@ -194,45 +194,55 @@ export default function AllMessages() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-500 dark:text-gray-400">Loading messages...</div>
+      <div className="flex items-center justify-center min-h-[400px] bg-black">
+        <div className="text-white">Loading messages...</div>
       </div>
     );
   }
 
   if (error && !data) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-red-500 dark:text-red-400">{error}</div>
+      <div className="flex items-center justify-center min-h-[400px] bg-black">
+        <div className="text-red-400">{error}</div>
       </div>
     );
   }
 
   if (!data || data.websites.length === 0) {
     return (
-      <div className="w-full">
+      <div className="w-full bg-black min-h-screen">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
+          <h1 className="text-2xl font-semibold text-white">
             All Messages
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-300 mt-1">
             View all chatbot messages
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <p className="text-gray-400 dark:text-gray-500 text-center">No record found</p>
+        <div className="bg-black rounded-lg border border-gray-700 p-6">
+          <p className="text-gray-400 text-center">No record found</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-black min-h-screen">
+      <style>
+        {`
+          .ai-response-content * {
+            color: #ffffff !important;
+          }
+          .ai-response-content a {
+            color: #60a5fa !important;
+          }
+        `}
+      </style>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
+        <h1 className="text-2xl font-semibold text-white">
           All Messages
         </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-gray-300 mt-1">
           Total: {data.total} messages | Page {data.page} of {data.total_pages}
         </p>
       </div>
@@ -245,16 +255,16 @@ export default function AllMessages() {
           return (
             <div
               key={websiteKey}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="bg-black rounded-lg border border-gray-700 overflow-hidden"
             >
               {/* Website Header */}
               <button
                 onClick={() => toggleWebsite(website.website_url)}
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-900 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <svg
-                    className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform ${
+                    className={`w-5 h-5 text-gray-300 transition-transform ${
                       isWebsiteExpanded ? "rotate-90" : ""
                     }`}
                     fill="none"
@@ -269,22 +279,22 @@ export default function AllMessages() {
                     />
                   </svg>
                   <div className="text-left">
-                    <div className="font-semibold text-gray-900 dark:text-white">
+                    <div className="font-semibold text-white">
                       {website.website_url}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-300">
                       Publish Key: {website.publish_key}
                     </div>
                   </div>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-300">
                   {website.ip_addresses.length} IP{website.ip_addresses.length !== 1 ? 's' : ''}
                 </div>
               </button>
 
               {/* IP Addresses */}
               {isWebsiteExpanded && (
-                <div className="border-t border-gray-200 dark:border-gray-700">
+                <div className="border-t border-gray-700">
                   {website.ip_addresses.map((ipData) => {
                     const ipKey = `${website.website_url}-${ipData.ip_address}`;
                     const isIPExpanded = expandedIPs.has(ipKey);
@@ -292,16 +302,16 @@ export default function AllMessages() {
                     return (
                       <div
                         key={ipKey}
-                        className="border-b border-gray-200 dark:border-gray-700 last:border-b-0"
+                        className="border-b border-gray-700 last:border-b-0"
                       >
                         {/* IP Address Header */}
                         <button
                           onClick={() => toggleIP(website.website_url, ipData.ip_address)}
-                          className="w-full flex items-center justify-between p-4 pl-12 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          className="w-full flex items-center justify-between p-4 pl-12 hover:bg-gray-900 transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             <svg
-                              className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform ${
+                              className={`w-5 h-5 text-gray-300 transition-transform ${
                                 isIPExpanded ? "rotate-90" : ""
                               }`}
                               fill="none"
@@ -315,59 +325,60 @@ export default function AllMessages() {
                                 d="M9 5l7 7-7 7"
                               />
                             </svg>
-                            <div className="font-medium text-gray-800 dark:text-gray-200">
+                            <div className="font-medium text-white">
                               IP: {ipData.ip_address}
                             </div>
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-gray-300">
                             {ipData.messages.length} message{ipData.messages.length !== 1 ? 's' : ''}
                           </div>
                         </button>
 
                         {/* Messages */}
                         {isIPExpanded && (
-                          <div className="bg-gray-50 dark:bg-gray-900/50">
+                          <div className="bg-black">
                             <div className="p-4 pl-20 space-y-4">
                               {ipData.messages.map((message) => (
                                 <div
                                   key={message.id}
-                                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3"
+                                  className="bg-black rounded-lg border border-gray-700 p-4 space-y-3"
                                 >
                                   <div className="flex items-start justify-between">
                                     <div>
-                                      <div className="font-medium text-gray-900 dark:text-white">
+                                      <div className="font-medium text-white">
                                         {message.username || "Anonymous"}
                                       </div>
                                       {message.email && (
-                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                        <div className="text-sm text-gray-300">
                                           {message.email}
                                         </div>
                                       )}
                                     </div>
-                                    <div className="text-xs text-gray-400 dark:text-gray-500">
+                                    <div className="text-xs text-gray-400">
                                       {formatDate(message.created_at)}
                                     </div>
                                   </div>
 
                                   <div className="space-y-2">
                                     <div>
-                                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                      <div className="text-xs font-medium text-gray-300 mb-1">
                                         User Message:
                                       </div>
-                                      <div className="text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 rounded p-2">
+                                      <div className="text-sm text-white bg-gray-900 rounded p-2">
                                         {message.user_message}
                                       </div>
                                     </div>
                                     <div>
-                                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                      <div className="text-xs font-medium text-gray-300 mb-1">
                                         AI Response:
                                       </div>
                                       <div 
-                                        className="text-sm text-gray-800 dark:text-gray-200 bg-blue-50 dark:bg-blue-900/20 rounded p-2 prose prose-sm max-w-none dark:prose-invert"
+                                        className="ai-response-content text-sm text-white bg-gray-900 rounded p-2 prose prose-sm max-w-none"
                                         dangerouslySetInnerHTML={{ __html: renderHTML(message.ai_response) }}
                                         style={{
                                           wordBreak: 'break-word',
-                                          lineHeight: '1.5'
+                                          lineHeight: '1.5',
+                                          color: '#ffffff'
                                         }}
                                       />
                                     </div>
@@ -393,7 +404,7 @@ export default function AllMessages() {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-white bg-black border border-gray-700 rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -418,7 +429,7 @@ export default function AllMessages() {
                   className={`px-3 py-2 text-sm font-medium rounded-lg ${
                     currentPage === pageNum
                       ? "bg-brand-500 text-white"
-                      : "text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      : "text-white bg-black border border-gray-700 hover:bg-gray-900"
                   }`}
                 >
                   {pageNum}
@@ -430,7 +441,7 @@ export default function AllMessages() {
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === data.total_pages}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-white bg-black border border-gray-700 rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
