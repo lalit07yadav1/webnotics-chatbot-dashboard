@@ -52,6 +52,11 @@ const adminNavItems: NavItem[] = [
   },
   {
     icon: <GridIcon />,
+    name: "Bot Users List",
+    path: "/admin-bot-users",
+  },
+  {
+    icon: <GridIcon />,
     name: "Settings",
     path: "/admin-settings",
   },

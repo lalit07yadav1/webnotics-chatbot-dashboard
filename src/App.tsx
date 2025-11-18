@@ -14,6 +14,7 @@ import KnowledgeBaseManagement from "./pages/ManageScript/KnowledgeBaseManagemen
 import CustomizeChatbot from "./pages/ManageScript/CustomizeChatbot";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AllMessages from "./pages/Admin/AllMessages";
+import BotUsersList from "./pages/Admin/BotUsersList";
 import Settings from "./pages/Admin/Settings";
 import Profile from "./pages/Profile/Profile";
 import ChangePassword from "./pages/Profile/ChangePassword";
@@ -84,6 +85,7 @@ export default function App() {
           >
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/admin-messages" element={<AllMessages />} />
+            <Route path="/admin-bot-users" element={<BotUsersList />} />
             <Route path="/admin-settings" element={<Settings />} />
           </Route>
 
