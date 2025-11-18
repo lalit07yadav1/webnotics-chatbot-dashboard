@@ -162,6 +162,121 @@
     submit_button_color: "#ffffff",
     submit_button_font_family: "Arial, sans-serif"
   };
+  // Add global styles to prevent CSS conflicts
+  function addGlobalStyles() {
+    const styleId = `webnotics-global-styles-${publishKey}`;
+    if (document.getElementById(styleId)) return;
+    
+    const globalStyle = document.createElement('style');
+    globalStyle.id = styleId;
+    globalStyle.textContent = `
+      /* Prevent conflicts with website CSS - Scoped to webnotics elements */
+      #webnotics-chatbot *,
+      #webnotics-form-overlay *,
+      #webnotics-toggle {
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      #webnotics-chatbot button,
+      #webnotics-form-overlay button,
+      #webnotics-toggle {
+        font-family: inherit !important;
+        font-size: inherit !important;
+        line-height: inherit !important;
+        text-decoration: none !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        word-spacing: normal !important;
+        text-indent: 0 !important;
+        text-shadow: none !important;
+        display: inline-block !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        outline: none !important;
+      }
+      
+      #webnotics-chatbot input,
+      #webnotics-form-overlay input {
+        font-family: inherit !important;
+        font-size: inherit !important;
+        line-height: inherit !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        outline: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background: transparent !important;
+      }
+      
+      #webnotics-chatbot div,
+      #webnotics-form-overlay div {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      #webnotics-chatbot p,
+      #webnotics-form-overlay p {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      #webnotics-chatbot h1,
+      #webnotics-chatbot h2,
+      #webnotics-chatbot h3,
+      #webnotics-chatbot h4,
+      #webnotics-chatbot h5,
+      #webnotics-chatbot h6,
+      #webnotics-form-overlay h1,
+      #webnotics-form-overlay h2,
+      #webnotics-form-overlay h3,
+      #webnotics-form-overlay h4,
+      #webnotics-form-overlay h5,
+      #webnotics-form-overlay h6 {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-weight: normal !important;
+        font-size: inherit !important;
+        line-height: inherit !important;
+      }
+      
+      #webnotics-chatbot span,
+      #webnotics-form-overlay span {
+        display: inline !important;
+      }
+      
+      #webnotics-chatbot img,
+      #webnotics-form-overlay img {
+        border: none !important;
+        max-width: 100% !important;
+        height: auto !important;
+        vertical-align: middle !important;
+      }
+      
+      #webnotics-chatbot ul,
+      #webnotics-chatbot ol,
+      #webnotics-form-overlay ul,
+      #webnotics-form-overlay ol {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      
+      #webnotics-chatbot a,
+      #webnotics-form-overlay a {
+        text-decoration: none !important;
+        color: inherit !important;
+      }
+    `;
+    document.head.appendChild(globalStyle);
+  }
+
   // Load Google Fonts dynamically
   function loadGoogleFont(fontFamily) {
     if (!fontFamily) return;
@@ -204,6 +319,9 @@
 
   async function loadCustomization() {
     try {
+      // Add global styles first to prevent conflicts
+      addGlobalStyles();
+      
       const res = await fetch(`${API_BASE}/widget-chatbot?publish_key=${encodeURIComponent(publishKey)}`);
       if (!res.ok) throw new Error('Failed to load customization');
       const data = await res.json();
@@ -219,6 +337,8 @@
       initChatbot();
     } catch (err) {
       customization = { ...DEFAULT_CUSTOMIZATION };
+      // Still add global styles even if customization fails
+      addGlobalStyles();
       console.error('Webnotics Chatbot: Failed to load customization', err);
     }
   }
@@ -394,11 +514,28 @@
     return result.error || 'Please enter a valid phone number (10-15 digits)';
   }
 
+  // Helper function to add !important to all CSS properties
+  function addImportant(cssString) {
+    if (!cssString) return cssString;
+    // Split by semicolon, add !important to each property, then join back
+    return cssString.split(';')
+      .map(prop => {
+        const trimmed = prop.trim();
+        if (!trimmed) return '';
+        // Check if !important already exists
+        if (trimmed.includes('!important')) return trimmed;
+        // Add !important before semicolon
+        return trimmed + ' !important';
+      })
+      .filter(prop => prop)
+      .join('; ') + (cssString.trim().endsWith(';') ? ';' : '');
+  }
+
   // Show user info form
   function showUserForm(callback) {
     const formOverlay = document.createElement('div');
     formOverlay.id = 'webnotics-form-overlay';
-    formOverlay.style.cssText = `
+    formOverlay.style.cssText = addImportant(`
       position: fixed;
       top: 0;
       left: 0;
@@ -409,10 +546,12 @@
       align-items: center;
       justify-content: center;
       z-index: 999998;
-    `;
+    `);
  
     const formBox = document.createElement('div');
-    formBox.style.cssText = `
+    formBox.id = 'webnotics-form-box';
+    formBox.className = 'webnotics-form-box';
+    formBox.style.cssText = addImportant(`
       background: ${customization?.background_color || '#FFFFFF'};
       color: ${customization?.text_color || '#000000'};
       padding: 24px;
@@ -420,22 +559,26 @@
       max-width: 400px;
       width: 90%;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
-    `;
+    `);
  
     const title = document.createElement('h3');
+    title.id = 'webnotics-form-title';
+    title.className = 'webnotics-form-title';
     title.textContent = customization?.brand_name || 'Welcome';
-    title.style.cssText = `
+    title.style.cssText = addImportant(`
       margin: 0 0 16px 0;
       color: ${customization?.header_text_color || customization?.text_color || '#000000'};
       font-family: ${customization?.header_font_family || customization?.font_family || 'Arial, sans-serif'};
       font-size: ${customization?.header_font_size || '18px'};
-    `;
+    `);
  
     const nameInput = document.createElement('input');
+    nameInput.id = 'webnotics-name-input';
+    nameInput.className = 'webnotics-name-input';
     nameInput.type = 'text';
     nameInput.placeholder = 'Your Name';
     nameInput.required = true;
-    nameInput.style.cssText = `
+    nameInput.style.cssText = addImportant(`
       width: 100%;
       padding: 10px;
       margin-bottom: 4px;
@@ -443,23 +586,26 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
       box-sizing: border-box;
-    `;
+    `);
 
     const nameError = document.createElement('div');
-    nameError.id = 'name-error';
-    nameError.style.cssText = `
+    nameError.id = 'webnotics-name-error';
+    nameError.className = 'webnotics-name-error';
+    nameError.style.cssText = addImportant(`
       color: #ff4444;
       font-size: 12px;
       margin-bottom: 12px;
       display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
-    `;
+    `);
  
     const emailInput = document.createElement('input');
+    emailInput.id = 'webnotics-email-input';
+    emailInput.className = 'webnotics-email-input';
     emailInput.type = 'email';
     emailInput.placeholder = 'Your Email';
     emailInput.required = true;
-    emailInput.style.cssText = `
+    emailInput.style.cssText = addImportant(`
       width: 100%;
       padding: 10px;
       margin-bottom: 4px;
@@ -467,23 +613,26 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
       box-sizing: border-box;
-    `;
+    `);
 
     const emailError = document.createElement('div');
-    emailError.id = 'email-error';
-    emailError.style.cssText = `
+    emailError.id = 'webnotics-email-error';
+    emailError.className = 'webnotics-email-error';
+    emailError.style.cssText = addImportant(`
       color: #ff4444;
       font-size: 12px;
       margin-bottom: 12px;
       display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
-    `;
+    `);
 
     const phoneInput = document.createElement('input');
+    phoneInput.id = 'webnotics-phone-input';
+    phoneInput.className = 'webnotics-phone-input';
     phoneInput.type = 'tel';
     phoneInput.placeholder = 'Your Phone Number (e.g., +1234567890)';
     phoneInput.required = true;
-    phoneInput.style.cssText = `
+    phoneInput.style.cssText = addImportant(`
       width: 100%;
       padding: 10px;
       margin-bottom: 4px;
@@ -491,21 +640,25 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
       box-sizing: border-box;
-    `;
+    `);
 
     const phoneError = document.createElement('div');
-    phoneError.id = 'phone-error';
-    phoneError.style.cssText = `
+    phoneError.id = 'webnotics-phone-error';
+    phoneError.className = 'webnotics-phone-error';
+    phoneError.style.cssText = addImportant(`
       color: #ff4444;
       font-size: 12px;
       margin-bottom: 16px;
       display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
-    `;
+    `);
 
     const submitBtn = document.createElement('button');
+    submitBtn.id = 'webnotics-form-submit';
+    submitBtn.className = 'webnotics-form-submit';
+    submitBtn.type = 'button';
     submitBtn.textContent = 'Start Chat';
-    submitBtn.style.cssText = `
+    submitBtn.style.cssText = addImportant(`
       width: 100%;
       padding: 12px;
       background: ${customization?.submit_button_bg || customization?.primary_color || '#0000FF'};
@@ -514,18 +667,18 @@
       border-radius: 6px;
       cursor: pointer;
       font-family: ${customization?.submit_button_font_family || customization?.font_family || 'Arial, sans-serif'};
-    `;
+    `);
  
     // Real-time validation
     nameInput.addEventListener('blur', () => {
       const name = nameInput.value.trim();
       if (name && !validateName(name)) {
         nameError.textContent = 'Please enter a valid name (at least 2 characters, letters only)';
-        nameError.style.display = 'block';
-        nameInput.style.borderColor = '#ff4444';
+        nameError.style.setProperty('display', 'block', 'important');
+        nameInput.style.setProperty('border-color', '#ff4444', 'important');
       } else {
-        nameError.style.display = 'none';
-        nameInput.style.borderColor = '#ccc';
+        nameError.style.setProperty('display', 'none', 'important');
+        nameInput.style.setProperty('border-color', '#ccc', 'important');
       }
     });
 
@@ -533,8 +686,8 @@
       if (nameError.style.display === 'block') {
         const name = nameInput.value.trim();
         if (validateName(name) || !name) {
-          nameError.style.display = 'none';
-          nameInput.style.borderColor = '#ccc';
+          nameError.style.setProperty('display', 'none', 'important');
+          nameInput.style.setProperty('border-color', '#ccc', 'important');
         }
       }
     });
@@ -543,11 +696,11 @@
       const email = emailInput.value.trim();
       if (email && !validateEmail(email)) {
         emailError.textContent = 'Please enter a valid email address';
-        emailError.style.display = 'block';
-        emailInput.style.borderColor = '#ff4444';
+        emailError.style.setProperty('display', 'block', 'important');
+        emailInput.style.setProperty('border-color', '#ff4444', 'important');
       } else {
-        emailError.style.display = 'none';
-        emailInput.style.borderColor = '#ccc';
+        emailError.style.setProperty('display', 'none', 'important');
+        emailInput.style.setProperty('border-color', '#ccc', 'important');
       }
     });
 
@@ -555,8 +708,8 @@
       if (emailError.style.display === 'block') {
         const email = emailInput.value.trim();
         if (validateEmail(email) || !email) {
-          emailError.style.display = 'none';
-          emailInput.style.borderColor = '#ccc';
+          emailError.style.setProperty('display', 'none', 'important');
+          emailInput.style.setProperty('border-color', '#ccc', 'important');
         }
       }
     });
@@ -565,11 +718,11 @@
       const phone = phoneInput.value.trim();
       if (phone && !getPhoneValidation(phone)) {
         phoneError.textContent = getPhoneErrorMessage(phone);
-        phoneError.style.display = 'block';
-        phoneInput.style.borderColor = '#ff4444';
+        phoneError.style.setProperty('display', 'block', 'important');
+        phoneInput.style.setProperty('border-color', '#ff4444', 'important');
       } else {
-        phoneError.style.display = 'none';
-        phoneInput.style.borderColor = '#ccc';
+        phoneError.style.setProperty('display', 'none', 'important');
+        phoneInput.style.setProperty('border-color', '#ccc', 'important');
       }
     });
 
@@ -577,8 +730,8 @@
       if (phoneError.style.display === 'block') {
         const phone = phoneInput.value.trim();
         if (getPhoneValidation(phone) || !phone) {
-          phoneError.style.display = 'none';
-          phoneInput.style.borderColor = '#ccc';
+          phoneError.style.setProperty('display', 'none', 'important');
+          phoneInput.style.setProperty('border-color', '#ccc', 'important');
         }
       }
     });
@@ -587,12 +740,12 @@
       e.preventDefault();
       
       // Reset errors
-      nameError.style.display = 'none';
-      emailError.style.display = 'none';
-      phoneError.style.display = 'none';
-      nameInput.style.borderColor = '#ccc';
-      emailInput.style.borderColor = '#ccc';
-      phoneInput.style.borderColor = '#ccc';
+      nameError.style.setProperty('display', 'none', 'important');
+      emailError.style.setProperty('display', 'none', 'important');
+      phoneError.style.setProperty('display', 'none', 'important');
+      nameInput.style.setProperty('border-color', '#ccc', 'important');
+      emailInput.style.setProperty('border-color', '#ccc', 'important');
+      phoneInput.style.setProperty('border-color', '#ccc', 'important');
       
       const name = nameInput.value.trim();
       const email = emailInput.value.trim();
@@ -603,39 +756,39 @@
       // Validate name
       if (!name) {
         nameError.textContent = 'Name is required';
-        nameError.style.display = 'block';
-        nameInput.style.borderColor = '#ff4444';
+        nameError.style.setProperty('display', 'block', 'important');
+        nameInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       } else if (!validateName(name)) {
         nameError.textContent = 'Please enter a valid name (at least 2 characters, letters only)';
-        nameError.style.display = 'block';
-        nameInput.style.borderColor = '#ff4444';
+        nameError.style.setProperty('display', 'block', 'important');
+        nameInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       }
       
       // Validate email
       if (!email) {
         emailError.textContent = 'Email is required';
-        emailError.style.display = 'block';
-        emailInput.style.borderColor = '#ff4444';
+        emailError.style.setProperty('display', 'block', 'important');
+        emailInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       } else if (!validateEmail(email)) {
         emailError.textContent = 'Please enter a valid email address';
-        emailError.style.display = 'block';
-        emailInput.style.borderColor = '#ff4444';
+        emailError.style.setProperty('display', 'block', 'important');
+        emailInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       }
       
       // Validate phone
       if (!phone) {
         phoneError.textContent = 'Phone number is required';
-        phoneError.style.display = 'block';
-        phoneInput.style.borderColor = '#ff4444';
+        phoneError.style.setProperty('display', 'block', 'important');
+        phoneInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       } else if (!getPhoneValidation(phone)) {
         phoneError.textContent = getPhoneErrorMessage(phone);
-        phoneError.style.display = 'block';
-        phoneInput.style.borderColor = '#ff4444';
+        phoneError.style.setProperty('display', 'block', 'important');
+        phoneInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       }
       
@@ -678,7 +831,7 @@
  
     const chatbot = document.createElement('div');
     chatbot.id = 'webnotics-chatbot';
-    chatbot.style.cssText = `
+    chatbot.style.cssText = addImportant(`
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -691,11 +844,13 @@
       flex-direction: column;
       z-index: 999999;
       font-family: ${customization.font_family};
-    `;
+    `);
  
     // Header
     const header = document.createElement('div');
-    header.style.cssText = `
+    header.id = 'webnotics-chat-header';
+    header.className = 'webnotics-chat-header';
+    header.style.cssText = addImportant(`
       background: ${customization.header_bg};
       color: ${customization.header_text_color};
       padding: 16px;
@@ -704,17 +859,21 @@
       align-items: center;
       gap: 12px;
       font-family: ${customization.header_font_family};
-    `;
+    `);
 
     // Create icon container
     const iconContainer = document.createElement('div');
-    iconContainer.style.cssText = 'width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
+    iconContainer.id = 'webnotics-icon-container';
+    iconContainer.className = 'webnotics-icon-container';
+    iconContainer.style.cssText = addImportant('width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;');
 
     if (customization.logo_url && customization.logo_url.trim()) {
       const logo = document.createElement('img');
+      logo.id = 'webnotics-logo';
+      logo.className = 'webnotics-logo';
       logo.src = customization.logo_url;
       logo.alt = customization.brand_name || 'AI assistant';
-      logo.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;';
+      logo.style.cssText = addImportant('width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;');
       logo.onerror = function() {
         // If logo fails to load, show bot icon instead
         iconContainer.innerHTML = `
@@ -740,19 +899,24 @@
     header.appendChild(iconContainer);
  
     const brandName = document.createElement('span');
+    brandName.id = 'webnotics-brand-name';
+    brandName.className = 'webnotics-brand-name';
     brandName.textContent = customization.brand_name || 'AI assistant';
-    brandName.style.cssText = `
+    brandName.style.cssText = addImportant(`
       font-weight: bold;
       font-size: ${customization.header_font_size};
       font-family: ${customization.header_font_family};
       color: ${customization.header_text_color};
       flex: 1;
-    `;
+    `);
     header.appendChild(brandName);
  
     const closeBtn = document.createElement('button');
+    closeBtn.id = 'webnotics-close-btn';
+    closeBtn.className = 'webnotics-close-btn';
+    closeBtn.type = 'button';
     closeBtn.innerHTML = '×';
-    closeBtn.style.cssText = `
+    closeBtn.style.cssText = addImportant(`
       margin-left: auto;
       background: none;
       border: none;
@@ -760,14 +924,15 @@
       font-size: 30px;
       cursor: pointer;
       line-height: 1;
-    `;
+    `);
     closeBtn.onclick = () => toggleChatbot();
     header.appendChild(closeBtn);
  
     // Chat container
     const chatContainer = document.createElement('div');
     chatContainer.id = 'webnotics-chat-container';
-    chatContainer.style.cssText = `
+    chatContainer.className = 'webnotics-chat-container';
+    chatContainer.style.cssText = addImportant(`
       flex: 1;
       overflow-y: auto;
       padding: 16px;
@@ -776,26 +941,29 @@
       flex-direction: column;
       gap: 12px;
       font-family: ${customization.font_family};
-    `;
+    `);
  
     // Load chat history only if user info exists (will be loaded in createChatbotUI)
  
     // Input area
     const inputArea = document.createElement('div');
-    inputArea.style.cssText = `
+    inputArea.id = 'webnotics-input-area';
+    inputArea.className = 'webnotics-input-area';
+    inputArea.style.cssText = addImportant(`
       padding: 12px 16px;
       border-top: 1px solid ${hexWithOpacity(customization.input_text_color, 0.15)};
       display: flex;
       gap: 10px;
       align-items: center;
       background: ${customization.input_bg};
-    `;
+    `);
 
     const input = document.createElement('input');
+    input.id = 'webnotics-chat-input';
+    input.className = 'webnotics-chat-input';
     input.type = 'text';
     input.placeholder = customization.input_placeholder_text || 'Type your message...';
-    input.id = 'webnotics-chat-input';
-    input.style.cssText = `
+    input.style.cssText = addImportant(`
       flex: 1;
       padding: 12px 16px;
       border: 1px solid ${hexWithOpacity(customization.input_text_color, 0.2)};
@@ -806,7 +974,7 @@
       font-size: 14px;
       outline: none;
       min-width: 0;
-    `;
+    `);
 
     const placeholderStyleId = `webnotics-placeholder-style-${publishKey}`;
     let placeholderStyle = document.getElementById(placeholderStyleId);
@@ -817,15 +985,18 @@
     }
     placeholderStyle.textContent = `
       #webnotics-chat-input::placeholder {
-        color: ${customization.input_placeholder_text_color};
-        font-family: ${customization.input_placeholder_font_family || customization.font_family};
-        opacity: 0.7;
+        color: ${customization.input_placeholder_text_color} !important;
+        font-family: ${customization.input_placeholder_font_family || customization.font_family} !important;
+        opacity: 0.7 !important;
       }
     `;
 
     const sendBtn = document.createElement('button');
+    sendBtn.id = 'webnotics-send-btn';
+    sendBtn.className = 'webnotics-send-btn';
+    sendBtn.type = 'button';
     sendBtn.textContent = 'Send';
-    sendBtn.style.cssText = `
+    sendBtn.style.cssText = addImportant(`
       padding: 12px 24px;
       background: ${customization.submit_button_bg};
       color: ${customization.submit_button_color};
@@ -838,7 +1009,7 @@
       white-space: nowrap;
       height: 44px;
       flex-shrink: 0;
-    `;
+    `);
  
     sendBtn.onclick = () => {
       if (!userInfo) {
@@ -874,8 +1045,10 @@
     // Toggle button
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'webnotics-toggle';
+    toggleBtn.className = 'webnotics-toggle';
+    toggleBtn.type = 'button';
     toggleBtn.innerHTML = '💬';
-    toggleBtn.style.cssText = `
+    toggleBtn.style.cssText = addImportant(`
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -890,7 +1063,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       z-index: 999998;
       display: none;
-    `;
+    `);
     toggleBtn.onclick = () => {
       // Check if user info exists before showing chatbot
       if (!userInfo) {
@@ -905,9 +1078,9 @@
  
     document.body.appendChild(toggleBtn);
     document.body.appendChild(chatbot);
- 
-    chatbot.style.display = 'none';
-    toggleBtn.style.display = 'block';
+
+    chatbot.style.setProperty('display', 'none', 'important');
+    toggleBtn.style.setProperty('display', 'block', 'important');
  
     // Load chat history only if user info exists
     if (userInfo) {
@@ -940,12 +1113,13 @@
  
   function createMessageElement(message, isUser) {
     const msgEl = document.createElement('div');
+    msgEl.className = isUser ? 'webnotics-user-message' : 'webnotics-bot-message';
     const background = isUser ? customization.user_message_bg : customization.bot_message_bg;
     const textColor = isUser ? customization.user_message_bg_text_color : customization.bot_message_bg_text_color;
     const fontFamily = isUser ? customization.user_message_font_family : customization.font_family;
     const fontSize = isUser ? customization.user_message_bg_font_size : customization.bot_message_bg_font_size;
     const alignment = isUser ? 'margin-left: auto;' : 'margin-right: auto;';
-    msgEl.style.cssText = `
+    msgEl.style.cssText = addImportant(`
       padding: 12px 16px;
       border-radius: 16px;
       max-width: 80%;
@@ -957,7 +1131,7 @@
       font-size: ${fontSize};
       ${alignment}
       box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
-    `;
+    `);
  
     // For bot messages, render HTML; for user messages, escape HTML for security
     if (isUser) {
@@ -1001,10 +1175,29 @@
     input.value = '';
     input.disabled = true;
  
-    // Show typing indicator
+    // Show typing indicator with animation
     const typing = document.createElement('div');
-    typing.textContent = 'Typing...';
-    typing.style.cssText = `
+    typing.id = 'webnotics-typing-indicator';
+    typing.className = 'webnotics-typing-indicator';
+    
+    // Create animated typing dots
+    const typingText = document.createElement('span');
+    typingText.textContent = 'Typing';
+    typingText.id = 'webnotics-typing-text';
+    
+    const typingDots = document.createElement('span');
+    typingDots.id = 'webnotics-typing-dots';
+    typingDots.textContent = '...';
+    typingDots.style.cssText = addImportant(`
+      display: inline-block;
+      width: 20px;
+      text-align: left;
+    `);
+    
+    typing.appendChild(typingText);
+    typing.appendChild(typingDots);
+    
+    typing.style.cssText = addImportant(`
       padding: 10px 14px;
       border-radius: 12px;
       background: ${hexWithOpacity(customization.bot_message_bg || customization.primary_color, 0.4)};
@@ -1013,7 +1206,49 @@
       font-family: ${customization.font_family};
       font-size: ${customization.bot_message_bg_font_size};
       align-self: flex-start;
-    `;
+      display: flex;
+      align-items: center;
+    `);
+    
+    // Add CSS animation for typing dots
+    const typingAnimationId = `webnotics-typing-animation-${publishKey}`;
+    let typingAnimationStyle = document.getElementById(typingAnimationId);
+    if (!typingAnimationStyle) {
+      typingAnimationStyle = document.createElement('style');
+      typingAnimationStyle.id = typingAnimationId;
+      typingAnimationStyle.textContent = `
+        @keyframes webnotics-typing-dots {
+          0%, 20% {
+            content: '.';
+          }
+          40% {
+            content: '..';
+          }
+          60%, 100% {
+            content: '...';
+          }
+        }
+        #webnotics-typing-dots {
+          animation: webnotics-typing-dots 1.4s steps(4, end) infinite !important;
+        }
+        #webnotics-typing-dots::after {
+          content: '...';
+          animation: webnotics-typing-dots 1.4s steps(4, end) infinite !important;
+        }
+      `;
+      document.head.appendChild(typingAnimationStyle);
+    }
+    
+    // Alternative: Use JavaScript animation for better browser compatibility
+    let dotCount = 0;
+    const typingInterval = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      typingDots.textContent = '.'.repeat(dotCount);
+    }, 400);
+    
+    // Store interval ID on typing element so we can clear it later
+    typing._typingInterval = typingInterval;
+    
     chatContainer.appendChild(typing);
     chatContainer.scrollTop = chatContainer.scrollHeight;
  
@@ -1035,9 +1270,13 @@
           publish_key: publishKey
         })
       });
- 
+
+      // Clear typing animation interval before removing
+      if (typing._typingInterval) {
+        clearInterval(typing._typingInterval);
+      }
       typing.remove();
- 
+
       if (!response.ok) {
         throw new Error('Failed to get response');
       }
@@ -1051,6 +1290,10 @@
       saveChatMessage(botMessage, false);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     } catch (err) {
+      // Clear typing animation interval before removing
+      if (typing._typingInterval) {
+        clearInterval(typing._typingInterval);
+      }
       typing.remove();
       const errorMsg = createMessageElement('Sorry, there was an error. Please try again.', false);
       chatContainer.appendChild(errorMsg);
@@ -1065,9 +1308,9 @@
     const chatbot = document.getElementById('webnotics-chatbot');
     const toggleBtn = document.getElementById('webnotics-toggle');
     if (chatbot && toggleBtn) {
-      if (chatbot.style.display === 'none') {
-        chatbot.style.display = 'flex';
-        toggleBtn.style.display = 'none';
+      if (chatbot.style.display === 'none' || chatbot.style.getPropertyValue('display') === 'none') {
+        chatbot.style.setProperty('display', 'flex', 'important');
+        toggleBtn.style.setProperty('display', 'none', 'important');
         // Refresh userInfo in case it was just set
         userInfo = getUserInfo();
         // Reload chat history if user info now exists
@@ -1089,8 +1332,8 @@
           }
         }
       } else {
-        chatbot.style.display = 'none';
-        toggleBtn.style.display = 'block';
+        chatbot.style.setProperty('display', 'none', 'important');
+        toggleBtn.style.setProperty('display', 'block', 'important');
       }
     }
   }
