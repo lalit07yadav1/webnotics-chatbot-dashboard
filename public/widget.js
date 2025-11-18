@@ -329,17 +329,40 @@
       gap: 12px;
       font-family: ${customization.header_font_family};
     `;
- 
-    if (customization.logo_url) {
+
+    // Create icon container
+    const iconContainer = document.createElement('div');
+    iconContainer.style.cssText = 'width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
+
+    if (customization.logo_url && customization.logo_url.trim()) {
       const logo = document.createElement('img');
       logo.src = customization.logo_url;
       logo.alt = customization.brand_name || 'AI assistant';
-      logo.style.cssText = 'max-width: 32px; max-height: 32px; width: auto; height: auto; border-radius: 50%; object-fit: cover; flex-shrink: 0;';
+      logo.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;';
       logo.onerror = function() {
-        this.style.display = 'none';
+        // If logo fails to load, show bot icon instead
+        iconContainer.innerHTML = `
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="${customization.header_text_color}" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"/>
+            <circle cx="8.5" cy="10.5" r="1.5" fill="${customization.header_text_color}"/>
+            <circle cx="15.5" cy="10.5" r="1.5" fill="${customization.header_text_color}"/>
+            <path d="M12 15.5C10.07 15.5 8.5 14.43 8.5 13H15.5C15.5 14.43 13.93 15.5 12 15.5Z"/>
+          </svg>
+        `;
       };
-      header.appendChild(logo);
+      iconContainer.appendChild(logo);
+    } else {
+      // Show bot icon when no logo URL
+      iconContainer.innerHTML = `
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="${customization.header_text_color}" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"/>
+          <circle cx="8.5" cy="10.5" r="1.5" fill="${customization.header_text_color}"/>
+          <circle cx="15.5" cy="10.5" r="1.5" fill="${customization.header_text_color}"/>
+          <path d="M12 15.5C10.07 15.5 8.5 14.43 8.5 13H15.5C15.5 14.43 13.93 15.5 12 15.5Z"/>
+        </svg>
+      `;
     }
+    header.appendChild(iconContainer);
  
     const brandName = document.createElement('span');
     brandName.textContent = customization.brand_name || 'AI assistant';

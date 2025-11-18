@@ -446,14 +446,13 @@ export default function CustomizeChatbot() {
         </div>
 
         <div>
-          <label className="block mb-2 text-sm text-gray-300">Logo URL</label>
+          <label className="block mb-2 text-sm text-gray-300">Logo URL <span className="text-gray-500 text-xs">(Optional)</span></label>
           <input
             type="url"
             className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white"
             placeholder="https://example.com/logo.png"
             value={logoUrl}
             onChange={(e) => setLogoUrl(e.target.value)}
-            required
           />
         </div>
 
