@@ -162,12 +162,60 @@
     submit_button_color: "#ffffff",
     submit_button_font_family: "Arial, sans-serif"
   };
+  // Load Google Fonts dynamically
+  function loadGoogleFont(fontFamily) {
+    if (!fontFamily) return;
+    
+    // Extract font name (remove fallbacks like "sans-serif", "serif", etc.)
+    const fontName = fontFamily.split(',')[0].trim();
+    
+    // List of Google Fonts (most popular ones)
+    const googleFonts = [
+      'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Source Sans Pro', 'Raleway',
+      'Ubuntu', 'Oswald', 'PT Sans', 'Droid Sans', 'Nunito', 'Inter', 'Work Sans', 'Fira Sans',
+      'Noto Sans', 'Muli', 'Quicksand', 'Rubik', 'Cabin', 'Dosis', 'Josefin Sans', 'Libre Franklin',
+      'Maven Pro', 'Nunito Sans', 'PT Sans Narrow', 'Titillium Web', 'Yanone Kaffeesatz', 'Barlow',
+      'DM Sans', 'Manrope', 'Plus Jakarta Sans', 'Space Grotesk', 'Figtree', 'Outfit', 'Sora',
+      'Merriweather', 'Playfair Display', 'Lora', 'Crimson Text', 'PT Serif', 'Source Serif Pro',
+      'Libre Baskerville', 'Bitter', 'Noto Serif', 'Roboto Slab', 'Droid Serif', 'Arvo', 'Bree Serif',
+      'Crete Round', 'Gentium Book Plus', 'Lusitana', 'Spectral', 'Vollkorn', 'Bebas Neue', 'Righteous',
+      'Fredoka One', 'Lobster', 'Pacifico', 'Dancing Script', 'Satisfy', 'Kalam', 'Permanent Marker',
+      'Shadows Into Light', 'Amatic SC', 'Bangers', 'Chewy', 'Comfortaa', 'Fugaz One', 'Indie Flower',
+      'Luckiest Guy', 'Monoton', 'Orbitron', 'Russo One', 'Sigmar One', 'Titan One', 'Roboto Mono',
+      'Source Code Pro', 'Fira Code', 'Fira Mono', 'Inconsolata', 'PT Mono', 'Space Mono', 'Courier Prime',
+      'JetBrains Mono', 'IBM Plex Mono', 'Caveat', 'Caveat Brush', 'Gloria Hallelujah', 'Gochi Hand',
+      'Handlee', 'Patrick Hand', 'Shadows Into Light Two'
+    ];
+    
+    // Check if it's a Google Font
+    if (googleFonts.includes(fontName)) {
+      // Check if font is already loaded
+      const fontId = `google-font-${fontName.replace(/\s+/g, '-').toLowerCase()}`;
+      if (document.getElementById(fontId)) return;
+      
+      // Create link element to load Google Font
+      const link = document.createElement('link');
+      link.id = fontId;
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, '+')}:wght@400;500;600;700&display=swap`;
+      document.head.appendChild(link);
+    }
+  }
+
   async function loadCustomization() {
     try {
       const res = await fetch(`${API_BASE}/widget-chatbot?publish_key=${encodeURIComponent(publishKey)}`);
       if (!res.ok) throw new Error('Failed to load customization');
       const data = await res.json();
       customization = { ...DEFAULT_CUSTOMIZATION, ...data };
+      
+      // Load Google Fonts for all font family fields
+      loadGoogleFont(customization.font_family);
+      loadGoogleFont(customization.header_font_family);
+      loadGoogleFont(customization.user_message_font_family);
+      loadGoogleFont(customization.input_placeholder_font_family);
+      loadGoogleFont(customization.submit_button_font_family);
+      
       initChatbot();
     } catch (err) {
       customization = { ...DEFAULT_CUSTOMIZATION };
