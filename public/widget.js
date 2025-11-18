@@ -129,7 +129,7 @@
     }
     return null;
   }
- 
+
   // Fetch customization data
   let customization = null;
   let userInfo = getUserInfo();
@@ -237,7 +237,7 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
- 
+
     const phoneInput = document.createElement('input');
     phoneInput.type = 'tel';
     phoneInput.placeholder = 'Your Phone Number';
@@ -250,7 +250,7 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
- 
+
     const submitBtn = document.createElement('button');
     submitBtn.textContent = 'Start Chat';
     submitBtn.style.cssText = `
@@ -277,7 +277,7 @@
         callback(info);
       }
     };
- 
+
     formBox.appendChild(title);
     formBox.appendChild(nameInput);
     formBox.appendChild(emailInput);
@@ -329,7 +329,7 @@
       gap: 12px;
       font-family: ${customization.header_font_family};
     `;
- 
+
     // Create icon container
     const iconContainer = document.createElement('div');
     iconContainer.style.cssText = 'width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
@@ -354,11 +354,10 @@
     } else {
       // Show bot icon when no logo URL
       iconContainer.innerHTML = `
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="${customization.header_text_color}" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"/>
-          <circle cx="8.5" cy="10.5" r="1.5" fill="${customization.header_text_color}"/>
-          <circle cx="15.5" cy="10.5" r="1.5" fill="${customization.header_text_color}"/>
-          <path d="M12 15.5C10.07 15.5 8.5 14.43 8.5 13H15.5C15.5 14.43 13.93 15.5 12 15.5Z"/>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H11V21H5V3H13V9H21ZM14 10V12H22V10H14ZM14 14V16H22V14H14ZM14 18V20H19V18H14Z" fill="${customization.header_text_color}"/>
+          <circle cx="9" cy="9" r="2" fill="${customization.header_text_color}"/>
+          <path d="M9 13C10.1 13 11 13.9 11 15V17H7V15C7 13.9 7.9 13 9 13Z" fill="${customization.header_text_color}"/>
         </svg>
       `;
     }
@@ -372,12 +371,11 @@
       font-family: ${customization.header_font_family};
       color: ${customization.header_text_color};
       flex: 1;
-      text-align: center;
     `;
     header.appendChild(brandName);
  
     const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = 'Ã—';
+    closeBtn.innerHTML = '×';
     closeBtn.style.cssText = `
       margin-left: auto;
       background: none;
@@ -416,7 +414,7 @@
       align-items: center;
       background: ${customization.input_bg};
     `;
- 
+
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = customization.input_placeholder_text || 'Type your message...';
@@ -433,7 +431,7 @@
       outline: none;
       min-width: 0;
     `;
- 
+
     const placeholderStyleId = `webnotics-placeholder-style-${publishKey}`;
     let placeholderStyle = document.getElementById(placeholderStyleId);
     if (!placeholderStyle) {
@@ -448,7 +446,7 @@
         opacity: 0.7;
       }
     `;
- 
+
     const sendBtn = document.createElement('button');
     sendBtn.textContent = 'Send';
     sendBtn.style.cssText = `
@@ -500,7 +498,7 @@
     // Toggle button
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'webnotics-toggle';
-    toggleBtn.innerHTML = 'ðŸ’¬';
+    toggleBtn.innerHTML = '💬';
     toggleBtn.style.cssText = `
       position: fixed;
       bottom: 20px;
