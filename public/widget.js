@@ -1,6 +1,6 @@
 (function () {
   'use strict';
- 
+
   // Get publish_key from script tag or data attribute
   function getPublishKey() {
     const scripts = document.getElementsByTagName('script');
@@ -12,17 +12,17 @@
     }
     return null;
   }
- 
+
   const publishKey = getPublishKey();
   if (!publishKey) {
     console.error('Webnotics Chatbot: publish_key not found');
     return;
   }
- 
+
   const API_BASE = 'https://webnotics-chatbot.onrender.com';
   const STORAGE_KEY = `webnotics_chat_${publishKey}`;
   const USER_KEY = `webnotics_user_${publishKey}`;
- 
+
   // Get or create user info
   function getUserInfo() {
     const stored = localStorage.getItem(USER_KEY);
@@ -35,11 +35,11 @@
     }
     return null;
   }
- 
+
   function saveUserInfo(userInfo) {
     localStorage.setItem(USER_KEY, JSON.stringify(userInfo));
   }
- 
+
   // Get or create session ID
   function getSessionId() {
     let sessionId = sessionStorage.getItem('webnotics_session_id');
@@ -49,7 +49,7 @@
     }
     return sessionId;
   }
- 
+
   // Get chat history
   function getChatHistory() {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -62,7 +62,7 @@
     }
     return [];
   }
- 
+
   // Save chat message
   function saveChatMessage(message, isUser = true) {
     const history = getChatHistory();
@@ -77,7 +77,7 @@
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   }
- 
+
   // Get IP address
   let cachedIpAddress = null;
   async function getIpAddress() {
@@ -96,7 +96,7 @@
       } catch (e) {
         // Fallback to text format
       }
-      
+
       // Fallback: try text format
       try {
         const textResponse = await fetch('https://api.ipify.org?format=text');
@@ -109,7 +109,7 @@
       } catch (e) {
         // Try alternative service
       }
-      
+
       // Alternative service
       try {
         const altResponse = await fetch('https://api64.ipify.org?format=json');
@@ -166,7 +166,7 @@
   function addGlobalStyles() {
     const styleId = `webnotics-global-styles-${publishKey}`;
     if (document.getElementById(styleId)) return;
-    
+
     const globalStyle = document.createElement('style');
     globalStyle.id = styleId;
     globalStyle.textContent = `
@@ -179,6 +179,26 @@
         padding: 0 !important;
       }
       
+      #webnotics-chatbot .webnotics-bot-message h2 {
+      font-style: italic;
+      font-weight: bold;
+      margin-bottom: 15px !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message h3 {
+      font-style: italic;
+      font-weight: bold !important;
+      margin-bottom: 10px !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message p {
+      margin-bottom: 10px !important;
+      }
+#webnotics-chatbot .webnotics-bot-message ul li {
+margin-bottom: 10px !important;
+}
+#webnotics-chatbot .webnotics-bot-message a {
+text-decoration: underline !important;
+    font-style: italic !important;
+    }
       #webnotics-chatbot button,
       #webnotics-form-overlay button,
       #webnotics-toggle {
@@ -199,7 +219,9 @@
         appearance: none !important;
         outline: none !important;
       }
-      
+      #webnotics-chatbot input, #webnotics-form-overlay input {
+      color: #000000;
+      } 
       #webnotics-chatbot input,
       #webnotics-form-overlay input {
         font-family: inherit !important;
@@ -280,10 +302,10 @@
   // Load Google Fonts dynamically
   function loadGoogleFont(fontFamily) {
     if (!fontFamily) return;
-    
+
     // Extract font name (remove fallbacks like "sans-serif", "serif", etc.)
     const fontName = fontFamily.split(',')[0].trim();
-    
+
     // List of Google Fonts (most popular ones)
     const googleFonts = [
       'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins', 'Source Sans Pro', 'Raleway',
@@ -301,13 +323,13 @@
       'JetBrains Mono', 'IBM Plex Mono', 'Caveat', 'Caveat Brush', 'Gloria Hallelujah', 'Gochi Hand',
       'Handlee', 'Patrick Hand', 'Shadows Into Light Two'
     ];
-    
+
     // Check if it's a Google Font
     if (googleFonts.includes(fontName)) {
       // Check if font is already loaded
       const fontId = `google-font-${fontName.replace(/\s+/g, '-').toLowerCase()}`;
       if (document.getElementById(fontId)) return;
-      
+
       // Create link element to load Google Font
       const link = document.createElement('link');
       link.id = fontId;
@@ -321,19 +343,19 @@
     try {
       // Add global styles first to prevent conflicts
       addGlobalStyles();
-      
+
       const res = await fetch(`${API_BASE}/widget-chatbot?publish_key=${encodeURIComponent(publishKey)}`);
       if (!res.ok) throw new Error('Failed to load customization');
       const data = await res.json();
       customization = { ...DEFAULT_CUSTOMIZATION, ...data };
-      
+
       // Load Google Fonts for all font family fields
       loadGoogleFont(customization.font_family);
       loadGoogleFont(customization.header_font_family);
       loadGoogleFont(customization.user_message_font_family);
       loadGoogleFont(customization.input_placeholder_font_family);
       loadGoogleFont(customization.submit_button_font_family);
-      
+
       initChatbot();
     } catch (err) {
       customization = { ...DEFAULT_CUSTOMIZATION };
@@ -342,111 +364,111 @@
       console.error('Webnotics Chatbot: Failed to load customization', err);
     }
   }
- 
+
   // Validation functions
   function validateEmail(email) {
     if (!email || typeof email !== 'string') {
       return false;
     }
-    
+
     const trimmedEmail = email.trim();
-    
+
     // Basic length check
     if (trimmedEmail.length < 5 || trimmedEmail.length > 254) {
       return false;
     }
-    
+
     // Check for @ symbol
     if (trimmedEmail.indexOf('@') === -1) {
       return false;
     }
-    
+
     // Split into local and domain parts
     const parts = trimmedEmail.split('@');
     if (parts.length !== 2) {
       return false;
     }
-    
+
     const localPart = parts[0];
     const domainPart = parts[1];
-    
+
     // Validate local part (before @)
     if (localPart.length === 0 || localPart.length > 64) {
       return false;
     }
-    
+
     // Local part cannot start or end with dot
     if (localPart.startsWith('.') || localPart.endsWith('.')) {
       return false;
     }
-    
+
     // Local part cannot have consecutive dots
     if (localPart.includes('..')) {
       return false;
     }
-    
+
     // Local part should only contain valid characters
     const localPartRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/;
     if (!localPartRegex.test(localPart)) {
       return false;
     }
-    
+
     // Validate domain part (after @)
     if (domainPart.length === 0 || domainPart.length > 253) {
       return false;
     }
-    
+
     // Domain cannot start or end with dot or hyphen
-    if (domainPart.startsWith('.') || domainPart.endsWith('.') || 
-        domainPart.startsWith('-') || domainPart.endsWith('-')) {
+    if (domainPart.startsWith('.') || domainPart.endsWith('.') ||
+      domainPart.startsWith('-') || domainPart.endsWith('-')) {
       return false;
     }
-    
+
     // Domain cannot have consecutive dots
     if (domainPart.includes('..')) {
       return false;
     }
-    
+
     // Domain must have at least one dot
     if (domainPart.indexOf('.') === -1) {
       return false;
     }
-    
+
     // Split domain into labels
     const domainLabels = domainPart.split('.');
-    
+
     // Check each label
     for (let i = 0; i < domainLabels.length; i++) {
       const label = domainLabels[i];
-      
+
       // Each label must be 1-63 characters
       if (label.length === 0 || label.length > 63) {
         return false;
       }
-      
+
       // Label cannot start or end with hyphen
       if (label.startsWith('-') || label.endsWith('-')) {
         return false;
       }
-      
+
       // Label should only contain alphanumeric and hyphens
       const labelRegex = /^[a-zA-Z0-9-]+$/;
       if (!labelRegex.test(label)) {
         return false;
       }
     }
-    
+
     // Top-level domain (last label) must be at least 2 characters and only letters
     const tld = domainLabels[domainLabels.length - 1];
     if (tld.length < 2 || !/^[a-zA-Z]+$/.test(tld)) {
       return false;
     }
-    
+
     // Final comprehensive regex check
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
     return emailRegex.test(trimmedEmail);
   }
-  
+
   function validateName(name) {
     // Name should be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes
     const nameRegex = /^[a-zA-Z\s'-]{2,}$/;
@@ -457,15 +479,15 @@
     if (!phone || typeof phone !== 'string') {
       return { valid: false, error: 'Phone number is required' };
     }
-    
+
     // Remove all formatting characters (spaces, dashes, parentheses, dots, plus signs)
     const cleaned = phone.replace(/[\s\-\(\)\.\+]/g, '');
-    
+
     // Check if it contains only digits
     if (!/^\d+$/.test(cleaned)) {
       return { valid: false, error: 'Phone number must contain only digits' };
     }
-    
+
     // Check length (10-15 digits for international format)
     if (cleaned.length < 10) {
       return { valid: false, error: 'Phone number must have at least 10 digits' };
@@ -473,18 +495,18 @@
     if (cleaned.length > 15) {
       return { valid: false, error: 'Phone number cannot exceed 15 digits' };
     }
-    
+
     // Additional checks for common invalid patterns
     // Reject if all digits are the same (e.g., 1111111111)
     if (/^(\d)\1{9,}$/.test(cleaned)) {
       return { valid: false, error: 'Phone number cannot have all same digits' };
     }
-    
+
     // Reject if it's all zeros
     if (/^0+$/.test(cleaned)) {
       return { valid: false, error: 'Phone number cannot be all zeros' };
     }
-    
+
     // Check for valid country code patterns (if starts with country code)
     // Most country codes are 1-3 digits
     // For numbers starting with 1 (US/Canada), should be 11 digits total
@@ -492,22 +514,22 @@
       // Valid US/Canada format
       return { valid: true, error: null };
     }
-    
+
     // For other international numbers, validate structure
     // Country code (1-3 digits) + subscriber number (at least 7 digits)
     if (cleaned.length >= 10 && cleaned.length <= 15) {
       return { valid: true, error: null };
     }
-    
+
     return { valid: false, error: 'Please enter a valid phone number (10-15 digits)' };
   }
-  
+
   // Helper function to get phone validation result
   function getPhoneValidation(phone) {
     const result = validatePhone(phone);
     return result.valid;
   }
-  
+
   // Helper function to get phone error message
   function getPhoneErrorMessage(phone) {
     const result = validatePhone(phone);
@@ -547,7 +569,7 @@
       justify-content: center;
       z-index: 999998;
     `);
- 
+
     const formBox = document.createElement('div');
     formBox.id = 'webnotics-form-box';
     formBox.className = 'webnotics-form-box';
@@ -560,18 +582,20 @@
       width: 90%;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `);
- 
+
     const title = document.createElement('h3');
     title.id = 'webnotics-form-title';
     title.className = 'webnotics-form-title';
     title.textContent = customization?.brand_name || 'Welcome';
     title.style.cssText = addImportant(`
       margin: 0 0 16px 0;
-      color: ${customization?.header_text_color || customization?.text_color || '#000000'};
+      font-weight: 700;
+      color: #000000;
       font-family: ${customization?.header_font_family || customization?.font_family || 'Arial, sans-serif'};
       font-size: ${customization?.header_font_size || '18px'};
+      text-align: center;
     `);
- 
+
     const nameInput = document.createElement('input');
     nameInput.id = 'webnotics-name-input';
     nameInput.className = 'webnotics-name-input';
@@ -581,7 +605,7 @@
     nameInput.style.cssText = addImportant(`
       width: 100%;
       padding: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
@@ -598,7 +622,7 @@
       display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `);
- 
+
     const emailInput = document.createElement('input');
     emailInput.id = 'webnotics-email-input';
     emailInput.className = 'webnotics-email-input';
@@ -608,7 +632,7 @@
     emailInput.style.cssText = addImportant(`
       width: 100%;
       padding: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
@@ -635,7 +659,7 @@
     phoneInput.style.cssText = addImportant(`
       width: 100%;
       padding: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
@@ -668,7 +692,7 @@
       cursor: pointer;
       font-family: ${customization?.submit_button_font_family || customization?.font_family || 'Arial, sans-serif'};
     `);
- 
+
     // Real-time validation
     nameInput.addEventListener('blur', () => {
       const name = nameInput.value.trim();
@@ -738,7 +762,7 @@
 
     submitBtn.onclick = (e) => {
       e.preventDefault();
-      
+
       // Reset errors
       nameError.style.setProperty('display', 'none', 'important');
       emailError.style.setProperty('display', 'none', 'important');
@@ -746,13 +770,13 @@
       nameInput.style.setProperty('border-color', '#ccc', 'important');
       emailInput.style.setProperty('border-color', '#ccc', 'important');
       phoneInput.style.setProperty('border-color', '#ccc', 'important');
-      
+
       const name = nameInput.value.trim();
       const email = emailInput.value.trim();
       const phone = phoneInput.value.trim();
-      
+
       let isValid = true;
-      
+
       // Validate name
       if (!name) {
         nameError.textContent = 'Name is required';
@@ -765,7 +789,7 @@
         nameInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       }
-      
+
       // Validate email
       if (!email) {
         emailError.textContent = 'Email is required';
@@ -778,7 +802,7 @@
         emailInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       }
-      
+
       // Validate phone
       if (!phone) {
         phoneError.textContent = 'Phone number is required';
@@ -791,7 +815,7 @@
         phoneInput.style.setProperty('border-color', '#ff4444', 'important');
         isValid = false;
       }
-      
+
       if (isValid) {
         const info = {
           name: name,
@@ -816,19 +840,19 @@
     document.body.appendChild(formOverlay);
     nameInput.focus();
   }
- 
+
   // Initialize chatbot UI
   function initChatbot() {
     if (!customization) return;
     // Always create UI - don't show form on load
     createChatbotUI();
   }
- 
+
   function createChatbotUI() {
     // Remove existing chatbot if any
     const existing = document.getElementById('webnotics-chatbot');
     if (existing) existing.remove();
- 
+
     const chatbot = document.createElement('div');
     chatbot.id = 'webnotics-chatbot';
     chatbot.style.cssText = addImportant(`
@@ -845,7 +869,7 @@
       z-index: 999999;
       font-family: ${customization.font_family};
     `);
- 
+
     // Header
     const header = document.createElement('div');
     header.id = 'webnotics-chat-header';
@@ -854,7 +878,7 @@
       background: ${customization.header_bg};
       color: ${customization.header_text_color};
       padding: 16px;
-      border-radius: 20px 20px 0 0;
+      border-radius: 17px 17px 0 0;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -865,7 +889,7 @@
     const iconContainer = document.createElement('div');
     iconContainer.id = 'webnotics-icon-container';
     iconContainer.className = 'webnotics-icon-container';
-    iconContainer.style.cssText = addImportant('width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;');
+    iconContainer.style.cssText = addImportant('max-width: 100px; max-height: 60px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;');
 
     if (customization.logo_url && customization.logo_url.trim()) {
       const logo = document.createElement('img');
@@ -873,8 +897,8 @@
       logo.className = 'webnotics-logo';
       logo.src = customization.logo_url;
       logo.alt = customization.brand_name || 'AI assistant';
-      logo.style.cssText = addImportant('width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;');
-      logo.onerror = function() {
+      logo.style.cssText = addImportant('width: auto; max-height: 60px; display: block;');
+      logo.onerror = function () {
         // If logo fails to load, show bot icon instead
         iconContainer.innerHTML = `
           <svg width="40" height="40" viewBox="0 0 24 24" fill="${customization.header_text_color}" xmlns="http://www.w3.org/2000/svg">
@@ -897,7 +921,7 @@
       `;
     }
     header.appendChild(iconContainer);
- 
+
     const brandName = document.createElement('span');
     brandName.id = 'webnotics-brand-name';
     brandName.className = 'webnotics-brand-name';
@@ -910,7 +934,7 @@
       flex: 1;
     `);
     header.appendChild(brandName);
- 
+
     const closeBtn = document.createElement('button');
     closeBtn.id = 'webnotics-close-btn';
     closeBtn.className = 'webnotics-close-btn';
@@ -927,7 +951,7 @@
     `);
     closeBtn.onclick = () => toggleChatbot();
     header.appendChild(closeBtn);
- 
+
     // Chat container
     const chatContainer = document.createElement('div');
     chatContainer.id = 'webnotics-chat-container';
@@ -939,12 +963,12 @@
       max-height: 400px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 20px;
       font-family: ${customization.font_family};
     `);
- 
+
     // Load chat history only if user info exists (will be loaded in createChatbotUI)
- 
+
     // Input area
     const inputArea = document.createElement('div');
     inputArea.id = 'webnotics-input-area';
@@ -956,6 +980,7 @@
       gap: 10px;
       align-items: center;
       background: ${customization.input_bg};
+      border-radius: 0 0 17px 17px !important;
     `);
 
     const input = document.createElement('input');
@@ -1010,7 +1035,7 @@
       height: 44px;
       flex-shrink: 0;
     `);
- 
+
     sendBtn.onclick = () => {
       if (!userInfo) {
         showUserForm((info) => {
@@ -1021,7 +1046,7 @@
       }
       sendMessage();
     };
- 
+
     input.onkeypress = (e) => {
       if (e.key === 'Enter') {
         if (!userInfo) {
@@ -1034,14 +1059,14 @@
         sendMessage();
       }
     };
- 
+
     inputArea.appendChild(input);
     inputArea.appendChild(sendBtn);
- 
+
     chatbot.appendChild(header);
     chatbot.appendChild(chatContainer);
     chatbot.appendChild(inputArea);
- 
+
     // Toggle button
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'webnotics-toggle';
@@ -1075,13 +1100,13 @@
       }
       toggleChatbot();
     };
- 
+
     document.body.appendChild(toggleBtn);
     document.body.appendChild(chatbot);
 
     chatbot.style.setProperty('display', 'none', 'important');
     toggleBtn.style.setProperty('display', 'block', 'important');
- 
+
     // Load chat history only if user info exists
     if (userInfo) {
       const history = getChatHistory();
@@ -1099,7 +1124,7 @@
       }
     }
   }
- 
+
   function hexWithOpacity(hex, opacity = 0.7) {
     hex = hex.replace('#', '');
     if (hex.length === 3) {
@@ -1110,7 +1135,7 @@
     const b = parseInt(hex.substring(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
- 
+
   function createMessageElement(message, isUser) {
     const msgEl = document.createElement('div');
     msgEl.className = isUser ? 'webnotics-user-message' : 'webnotics-bot-message';
@@ -1132,7 +1157,7 @@
       ${alignment}
       box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
     `);
- 
+
     // For bot messages, render HTML; for user messages, escape HTML for security
     if (isUser) {
       msgEl.textContent = message;
@@ -1156,35 +1181,35 @@
       nodesToRemove.forEach(n => n.replaceWith(...Array.from(n.childNodes)));
       msgEl.innerHTML = tempDiv.innerHTML;
     }
- 
+
     return msgEl;
   }
- 
+
   async function sendMessage() {
     const input = document.getElementById('webnotics-chat-input');
     const message = input.value.trim();
     if (!message || !userInfo) return;
- 
+
     // Add user message to UI
     const chatContainer = document.getElementById('webnotics-chat-container');
     const userMsg = createMessageElement(message, true);
     chatContainer.appendChild(userMsg);
     saveChatMessage(message, true);
     chatContainer.scrollTop = chatContainer.scrollHeight;
- 
+
     input.value = '';
     input.disabled = true;
- 
+
     // Show typing indicator with animation
     const typing = document.createElement('div');
     typing.id = 'webnotics-typing-indicator';
     typing.className = 'webnotics-typing-indicator';
-    
+
     // Create animated typing dots
     const typingText = document.createElement('span');
     typingText.textContent = 'Typing';
     typingText.id = 'webnotics-typing-text';
-    
+
     const typingDots = document.createElement('span');
     typingDots.id = 'webnotics-typing-dots';
     typingDots.textContent = '...';
@@ -1193,10 +1218,10 @@
       width: 20px;
       text-align: left;
     `);
-    
+
     typing.appendChild(typingText);
     typing.appendChild(typingDots);
-    
+
     typing.style.cssText = addImportant(`
       padding: 10px 14px;
       border-radius: 12px;
@@ -1209,7 +1234,7 @@
       display: flex;
       align-items: center;
     `);
-    
+
     // Add CSS animation for typing dots
     const typingAnimationId = `webnotics-typing-animation-${publishKey}`;
     let typingAnimationStyle = document.getElementById(typingAnimationId);
@@ -1238,24 +1263,24 @@
       `;
       document.head.appendChild(typingAnimationStyle);
     }
-    
+
     // Alternative: Use JavaScript animation for better browser compatibility
     let dotCount = 0;
     const typingInterval = setInterval(() => {
       dotCount = (dotCount + 1) % 4;
       typingDots.textContent = '.'.repeat(dotCount);
     }, 400);
-    
+
     // Store interval ID on typing element so we can clear it later
     typing._typingInterval = typingInterval;
-    
+
     chatContainer.appendChild(typing);
     chatContainer.scrollTop = chatContainer.scrollHeight;
- 
+
     try {
       // Get IP address dynamically
       const ipAddress = await getIpAddress();
-      
+
       const response = await fetch(`${API_BASE}/chat?website_url=${encodeURIComponent(customization.website_url)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1280,10 +1305,10 @@
       if (!response.ok) {
         throw new Error('Failed to get response');
       }
- 
+
       const data = await response.json();
       const botMessage = data.message || data.response || 'Sorry, I could not process your request.';
- 
+
       // Remove any existing messages at the end (in case of duplicates)
       const botMsg = createMessageElement(botMessage, false);
       chatContainer.appendChild(botMsg);
@@ -1299,11 +1324,11 @@
       chatContainer.appendChild(errorMsg);
       console.error('Webnotics Chatbot error:', err);
     }
- 
+
     input.disabled = false;
     input.focus();
   }
- 
+
   function toggleChatbot() {
     const chatbot = document.getElementById('webnotics-chatbot');
     const toggleBtn = document.getElementById('webnotics-toggle');
@@ -1337,7 +1362,7 @@
       }
     }
   }
- 
+
   // Initialize
   loadCustomization();
 })();
