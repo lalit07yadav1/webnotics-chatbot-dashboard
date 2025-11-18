@@ -223,6 +223,20 @@
     }
   }
  
+  // Validation functions
+  function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function validatePhone(phone) {
+    // Remove spaces, dashes, parentheses, and plus signs for validation
+    const cleaned = phone.replace(/[\s\-\(\)\+]/g, '');
+    // Check if it contains only digits and has 10-15 digits (international format)
+    const phoneRegex = /^\d{10,15}$/;
+    return phoneRegex.test(cleaned);
+  }
+
   // Show user info form
   function showUserForm(callback) {
     const formOverlay = document.createElement('div');
@@ -280,22 +294,44 @@
     emailInput.style.cssText = `
       width: 100%;
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-family: ${customization?.font_family || 'Arial, sans-serif'};
+      box-sizing: border-box;
+    `;
+
+    const emailError = document.createElement('div');
+    emailError.id = 'email-error';
+    emailError.style.cssText = `
+      color: #ff4444;
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
 
     const phoneInput = document.createElement('input');
     phoneInput.type = 'tel';
-    phoneInput.placeholder = 'Your Phone Number';
+    phoneInput.placeholder = 'Your Phone Number (e.g., +1234567890)';
     phoneInput.required = true;
     phoneInput.style.cssText = `
       width: 100%;
       padding: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 4px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-family: ${customization?.font_family || 'Arial, sans-serif'};
+      box-sizing: border-box;
+    `;
+
+    const phoneError = document.createElement('div');
+    phoneError.id = 'phone-error';
+    phoneError.style.cssText = `
+      color: #ff4444;
+      font-size: 12px;
+      margin-bottom: 16px;
+      display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
 
@@ -312,13 +348,102 @@
       font-family: ${customization?.submit_button_font_family || customization?.font_family || 'Arial, sans-serif'};
     `;
  
+    // Real-time validation
+    emailInput.addEventListener('blur', () => {
+      const email = emailInput.value.trim();
+      if (email && !validateEmail(email)) {
+        emailError.textContent = 'Please enter a valid email address';
+        emailError.style.display = 'block';
+        emailInput.style.borderColor = '#ff4444';
+      } else {
+        emailError.style.display = 'none';
+        emailInput.style.borderColor = '#ccc';
+      }
+    });
+
+    emailInput.addEventListener('input', () => {
+      if (emailError.style.display === 'block') {
+        const email = emailInput.value.trim();
+        if (validateEmail(email) || !email) {
+          emailError.style.display = 'none';
+          emailInput.style.borderColor = '#ccc';
+        }
+      }
+    });
+
+    phoneInput.addEventListener('blur', () => {
+      const phone = phoneInput.value.trim();
+      if (phone && !validatePhone(phone)) {
+        phoneError.textContent = 'Please enter a valid phone number (10-15 digits)';
+        phoneError.style.display = 'block';
+        phoneInput.style.borderColor = '#ff4444';
+      } else {
+        phoneError.style.display = 'none';
+        phoneInput.style.borderColor = '#ccc';
+      }
+    });
+
+    phoneInput.addEventListener('input', () => {
+      if (phoneError.style.display === 'block') {
+        const phone = phoneInput.value.trim();
+        if (validatePhone(phone) || !phone) {
+          phoneError.style.display = 'none';
+          phoneInput.style.borderColor = '#ccc';
+        }
+      }
+    });
+
     submitBtn.onclick = (e) => {
       e.preventDefault();
-      if (nameInput.value && emailInput.value && phoneInput.value) {
+      
+      // Reset errors
+      emailError.style.display = 'none';
+      phoneError.style.display = 'none';
+      emailInput.style.borderColor = '#ccc';
+      phoneInput.style.borderColor = '#ccc';
+      
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const phone = phoneInput.value.trim();
+      
+      let isValid = true;
+      
+      // Validate name
+      if (!name) {
+        isValid = false;
+      }
+      
+      // Validate email
+      if (!email) {
+        emailError.textContent = 'Email is required';
+        emailError.style.display = 'block';
+        emailInput.style.borderColor = '#ff4444';
+        isValid = false;
+      } else if (!validateEmail(email)) {
+        emailError.textContent = 'Please enter a valid email address';
+        emailError.style.display = 'block';
+        emailInput.style.borderColor = '#ff4444';
+        isValid = false;
+      }
+      
+      // Validate phone
+      if (!phone) {
+        phoneError.textContent = 'Phone number is required';
+        phoneError.style.display = 'block';
+        phoneInput.style.borderColor = '#ff4444';
+        isValid = false;
+      } else if (!validatePhone(phone)) {
+        phoneError.textContent = 'Please enter a valid phone number (10-15 digits)';
+        phoneError.style.display = 'block';
+        phoneInput.style.borderColor = '#ff4444';
+        isValid = false;
+      }
+      
+      if (isValid) {
         const info = {
-          name: nameInput.value.trim(),
-          email: emailInput.value.trim(),
-          phone: phoneInput.value.trim()
+          name: name,
+          email: email,
+          phone: phone
         };
         saveUserInfo(info);
         formOverlay.remove();
@@ -329,7 +454,9 @@
     formBox.appendChild(title);
     formBox.appendChild(nameInput);
     formBox.appendChild(emailInput);
+    formBox.appendChild(emailError);
     formBox.appendChild(phoneInput);
+    formBox.appendChild(phoneError);
     formBox.appendChild(submitBtn);
     formOverlay.appendChild(formBox);
     document.body.appendChild(formOverlay);
