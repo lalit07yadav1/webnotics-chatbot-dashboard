@@ -332,13 +332,13 @@
  
     // Create icon container
     const iconContainer = document.createElement('div');
-    iconContainer.style.cssText = 'width: 100%; max-width: 100px; height: auto; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
- 
+    iconContainer.style.cssText = 'width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
+
     if (customization.logo_url && customization.logo_url.trim()) {
       const logo = document.createElement('img');
       logo.src = customization.logo_url;
       logo.alt = customization.brand_name || 'AI assistant';
-      logo.style.cssText = 'width: 100%; max-width: 100px; height: auto; border-radius: 0px; object-fit: cover; display: block;';
+      logo.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;';
       logo.onerror = function() {
         // If logo fails to load, show bot icon instead
         iconContainer.innerHTML = `
