@@ -225,16 +225,173 @@
  
   // Validation functions
   function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    if (!email || typeof email !== 'string') {
+      return false;
+    }
+    
+    const trimmedEmail = email.trim();
+    
+    // Basic length check
+    if (trimmedEmail.length < 5 || trimmedEmail.length > 254) {
+      return false;
+    }
+    
+    // Check for @ symbol
+    if (trimmedEmail.indexOf('@') === -1) {
+      return false;
+    }
+    
+    // Split into local and domain parts
+    const parts = trimmedEmail.split('@');
+    if (parts.length !== 2) {
+      return false;
+    }
+    
+    const localPart = parts[0];
+    const domainPart = parts[1];
+    
+    // Validate local part (before @)
+    if (localPart.length === 0 || localPart.length > 64) {
+      return false;
+    }
+    
+    // Local part cannot start or end with dot
+    if (localPart.startsWith('.') || localPart.endsWith('.')) {
+      return false;
+    }
+    
+    // Local part cannot have consecutive dots
+    if (localPart.includes('..')) {
+      return false;
+    }
+    
+    // Local part should only contain valid characters
+    const localPartRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/;
+    if (!localPartRegex.test(localPart)) {
+      return false;
+    }
+    
+    // Validate domain part (after @)
+    if (domainPart.length === 0 || domainPart.length > 253) {
+      return false;
+    }
+    
+    // Domain cannot start or end with dot or hyphen
+    if (domainPart.startsWith('.') || domainPart.endsWith('.') || 
+        domainPart.startsWith('-') || domainPart.endsWith('-')) {
+      return false;
+    }
+    
+    // Domain cannot have consecutive dots
+    if (domainPart.includes('..')) {
+      return false;
+    }
+    
+    // Domain must have at least one dot
+    if (domainPart.indexOf('.') === -1) {
+      return false;
+    }
+    
+    // Split domain into labels
+    const domainLabels = domainPart.split('.');
+    
+    // Check each label
+    for (let i = 0; i < domainLabels.length; i++) {
+      const label = domainLabels[i];
+      
+      // Each label must be 1-63 characters
+      if (label.length === 0 || label.length > 63) {
+        return false;
+      }
+      
+      // Label cannot start or end with hyphen
+      if (label.startsWith('-') || label.endsWith('-')) {
+        return false;
+      }
+      
+      // Label should only contain alphanumeric and hyphens
+      const labelRegex = /^[a-zA-Z0-9-]+$/;
+      if (!labelRegex.test(label)) {
+        return false;
+      }
+    }
+    
+    // Top-level domain (last label) must be at least 2 characters and only letters
+    const tld = domainLabels[domainLabels.length - 1];
+    if (tld.length < 2 || !/^[a-zA-Z]+$/.test(tld)) {
+      return false;
+    }
+    
+    // Final comprehensive regex check
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(trimmedEmail);
+  }
+  
+  function validateName(name) {
+    // Name should be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes
+    const nameRegex = /^[a-zA-Z\s'-]{2,}$/;
+    return nameRegex.test(name.trim());
   }
 
   function validatePhone(phone) {
-    // Remove spaces, dashes, parentheses, and plus signs for validation
-    const cleaned = phone.replace(/[\s\-\(\)\+]/g, '');
-    // Check if it contains only digits and has 10-15 digits (international format)
-    const phoneRegex = /^\d{10,15}$/;
-    return phoneRegex.test(cleaned);
+    if (!phone || typeof phone !== 'string') {
+      return { valid: false, error: 'Phone number is required' };
+    }
+    
+    // Remove all formatting characters (spaces, dashes, parentheses, dots, plus signs)
+    const cleaned = phone.replace(/[\s\-\(\)\.\+]/g, '');
+    
+    // Check if it contains only digits
+    if (!/^\d+$/.test(cleaned)) {
+      return { valid: false, error: 'Phone number must contain only digits' };
+    }
+    
+    // Check length (10-15 digits for international format)
+    if (cleaned.length < 10) {
+      return { valid: false, error: 'Phone number must have at least 10 digits' };
+    }
+    if (cleaned.length > 15) {
+      return { valid: false, error: 'Phone number cannot exceed 15 digits' };
+    }
+    
+    // Additional checks for common invalid patterns
+    // Reject if all digits are the same (e.g., 1111111111)
+    if (/^(\d)\1{9,}$/.test(cleaned)) {
+      return { valid: false, error: 'Phone number cannot have all same digits' };
+    }
+    
+    // Reject if it's all zeros
+    if (/^0+$/.test(cleaned)) {
+      return { valid: false, error: 'Phone number cannot be all zeros' };
+    }
+    
+    // Check for valid country code patterns (if starts with country code)
+    // Most country codes are 1-3 digits
+    // For numbers starting with 1 (US/Canada), should be 11 digits total
+    if (cleaned.startsWith('1') && cleaned.length === 11) {
+      // Valid US/Canada format
+      return { valid: true, error: null };
+    }
+    
+    // For other international numbers, validate structure
+    // Country code (1-3 digits) + subscriber number (at least 7 digits)
+    if (cleaned.length >= 10 && cleaned.length <= 15) {
+      return { valid: true, error: null };
+    }
+    
+    return { valid: false, error: 'Please enter a valid phone number (10-15 digits)' };
+  }
+  
+  // Helper function to get phone validation result
+  function getPhoneValidation(phone) {
+    const result = validatePhone(phone);
+    return result.valid;
+  }
+  
+  // Helper function to get phone error message
+  function getPhoneErrorMessage(phone) {
+    const result = validatePhone(phone);
+    return result.error || 'Please enter a valid phone number (10-15 digits)';
   }
 
   // Show user info form
@@ -281,9 +438,20 @@
     nameInput.style.cssText = `
       width: 100%;
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-family: ${customization?.font_family || 'Arial, sans-serif'};
+      box-sizing: border-box;
+    `;
+
+    const nameError = document.createElement('div');
+    nameError.id = 'name-error';
+    nameError.style.cssText = `
+      color: #ff4444;
+      font-size: 12px;
+      margin-bottom: 12px;
+      display: none;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
  
@@ -349,6 +517,28 @@
     `;
  
     // Real-time validation
+    nameInput.addEventListener('blur', () => {
+      const name = nameInput.value.trim();
+      if (name && !validateName(name)) {
+        nameError.textContent = 'Please enter a valid name (at least 2 characters, letters only)';
+        nameError.style.display = 'block';
+        nameInput.style.borderColor = '#ff4444';
+      } else {
+        nameError.style.display = 'none';
+        nameInput.style.borderColor = '#ccc';
+      }
+    });
+
+    nameInput.addEventListener('input', () => {
+      if (nameError.style.display === 'block') {
+        const name = nameInput.value.trim();
+        if (validateName(name) || !name) {
+          nameError.style.display = 'none';
+          nameInput.style.borderColor = '#ccc';
+        }
+      }
+    });
+
     emailInput.addEventListener('blur', () => {
       const email = emailInput.value.trim();
       if (email && !validateEmail(email)) {
@@ -373,8 +563,8 @@
 
     phoneInput.addEventListener('blur', () => {
       const phone = phoneInput.value.trim();
-      if (phone && !validatePhone(phone)) {
-        phoneError.textContent = 'Please enter a valid phone number (10-15 digits)';
+      if (phone && !getPhoneValidation(phone)) {
+        phoneError.textContent = getPhoneErrorMessage(phone);
         phoneError.style.display = 'block';
         phoneInput.style.borderColor = '#ff4444';
       } else {
@@ -386,7 +576,7 @@
     phoneInput.addEventListener('input', () => {
       if (phoneError.style.display === 'block') {
         const phone = phoneInput.value.trim();
-        if (validatePhone(phone) || !phone) {
+        if (getPhoneValidation(phone) || !phone) {
           phoneError.style.display = 'none';
           phoneInput.style.borderColor = '#ccc';
         }
@@ -397,8 +587,10 @@
       e.preventDefault();
       
       // Reset errors
+      nameError.style.display = 'none';
       emailError.style.display = 'none';
       phoneError.style.display = 'none';
+      nameInput.style.borderColor = '#ccc';
       emailInput.style.borderColor = '#ccc';
       phoneInput.style.borderColor = '#ccc';
       
@@ -410,6 +602,14 @@
       
       // Validate name
       if (!name) {
+        nameError.textContent = 'Name is required';
+        nameError.style.display = 'block';
+        nameInput.style.borderColor = '#ff4444';
+        isValid = false;
+      } else if (!validateName(name)) {
+        nameError.textContent = 'Please enter a valid name (at least 2 characters, letters only)';
+        nameError.style.display = 'block';
+        nameInput.style.borderColor = '#ff4444';
         isValid = false;
       }
       
@@ -432,8 +632,8 @@
         phoneError.style.display = 'block';
         phoneInput.style.borderColor = '#ff4444';
         isValid = false;
-      } else if (!validatePhone(phone)) {
-        phoneError.textContent = 'Please enter a valid phone number (10-15 digits)';
+      } else if (!getPhoneValidation(phone)) {
+        phoneError.textContent = getPhoneErrorMessage(phone);
         phoneError.style.display = 'block';
         phoneInput.style.borderColor = '#ff4444';
         isValid = false;
@@ -453,6 +653,7 @@
 
     formBox.appendChild(title);
     formBox.appendChild(nameInput);
+    formBox.appendChild(nameError);
     formBox.appendChild(emailInput);
     formBox.appendChild(emailError);
     formBox.appendChild(phoneInput);
