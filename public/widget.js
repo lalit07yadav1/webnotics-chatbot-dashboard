@@ -232,12 +232,25 @@
     emailInput.style.cssText = `
       width: 100%;
       padding: 10px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: ${customization?.font_family || 'Arial, sans-serif'};
+    `;
+
+    const phoneInput = document.createElement('input');
+    phoneInput.type = 'tel';
+    phoneInput.placeholder = 'Your Phone Number';
+    phoneInput.required = true;
+    phoneInput.style.cssText = `
+      width: 100%;
+      padding: 10px;
       margin-bottom: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
- 
+
     const submitBtn = document.createElement('button');
     submitBtn.textContent = 'Start Chat';
     submitBtn.style.cssText = `
@@ -253,20 +266,22 @@
  
     submitBtn.onclick = (e) => {
       e.preventDefault();
-      if (nameInput.value && emailInput.value) {
+      if (nameInput.value && emailInput.value && phoneInput.value) {
         const info = {
           name: nameInput.value.trim(),
-          email: emailInput.value.trim()
+          email: emailInput.value.trim(),
+          phone: phoneInput.value.trim()
         };
         saveUserInfo(info);
         formOverlay.remove();
         callback(info);
       }
     };
- 
+
     formBox.appendChild(title);
     formBox.appendChild(nameInput);
     formBox.appendChild(emailInput);
+    formBox.appendChild(phoneInput);
     formBox.appendChild(submitBtn);
     formOverlay.appendChild(formBox);
     document.body.appendChild(formOverlay);
@@ -617,6 +632,7 @@
           session_id: sessionId,
           user_email: userInfo.email,
           user_name: userInfo.name,
+          phone_number: userInfo.phone || null,
           ip_address: ipAddress || null,
           publish_key: publishKey
         })
