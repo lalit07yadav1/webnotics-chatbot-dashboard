@@ -129,7 +129,7 @@
     }
     return null;
   }
-
+ 
   // Fetch customization data
   let customization = null;
   let userInfo = getUserInfo();
@@ -237,7 +237,7 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
-
+ 
     const phoneInput = document.createElement('input');
     phoneInput.type = 'tel';
     phoneInput.placeholder = 'Your Phone Number';
@@ -250,7 +250,7 @@
       border-radius: 6px;
       font-family: ${customization?.font_family || 'Arial, sans-serif'};
     `;
-
+ 
     const submitBtn = document.createElement('button');
     submitBtn.textContent = 'Start Chat';
     submitBtn.style.cssText = `
@@ -277,7 +277,7 @@
         callback(info);
       }
     };
-
+ 
     formBox.appendChild(title);
     formBox.appendChild(nameInput);
     formBox.appendChild(emailInput);
@@ -329,16 +329,16 @@
       gap: 12px;
       font-family: ${customization.header_font_family};
     `;
-
+ 
     // Create icon container
     const iconContainer = document.createElement('div');
-    iconContainer.style.cssText = 'width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
-
+    iconContainer.style.cssText = 'width: 100%; max-width: 100px; height: auto; flex-shrink: 0; display: flex; align-items: center; justify-content: center;';
+ 
     if (customization.logo_url && customization.logo_url.trim()) {
       const logo = document.createElement('img');
       logo.src = customization.logo_url;
       logo.alt = customization.brand_name || 'AI assistant';
-      logo.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block;';
+      logo.style.cssText = 'width: 100%; max-width: 100px; height: auto; border-radius: 0px; object-fit: cover; display: block;';
       logo.onerror = function() {
         // If logo fails to load, show bot icon instead
         iconContainer.innerHTML = `
@@ -372,11 +372,12 @@
       font-family: ${customization.header_font_family};
       color: ${customization.header_text_color};
       flex: 1;
+      text-align: center;
     `;
     header.appendChild(brandName);
  
     const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '×';
+    closeBtn.innerHTML = 'Ã—';
     closeBtn.style.cssText = `
       margin-left: auto;
       background: none;
@@ -415,7 +416,7 @@
       align-items: center;
       background: ${customization.input_bg};
     `;
-
+ 
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = customization.input_placeholder_text || 'Type your message...';
@@ -432,7 +433,7 @@
       outline: none;
       min-width: 0;
     `;
-
+ 
     const placeholderStyleId = `webnotics-placeholder-style-${publishKey}`;
     let placeholderStyle = document.getElementById(placeholderStyleId);
     if (!placeholderStyle) {
@@ -447,7 +448,7 @@
         opacity: 0.7;
       }
     `;
-
+ 
     const sendBtn = document.createElement('button');
     sendBtn.textContent = 'Send';
     sendBtn.style.cssText = `
@@ -499,7 +500,7 @@
     // Toggle button
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'webnotics-toggle';
-    toggleBtn.innerHTML = '💬';
+    toggleBtn.innerHTML = 'ðŸ’¬';
     toggleBtn.style.cssText = `
       position: fixed;
       bottom: 20px;
