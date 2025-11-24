@@ -119,7 +119,7 @@ export default function SignInForm() {
                 <div className="flex items-center justify-end">
 
                   <Link
-                    to="#"
+                    to="/forgot-password"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     Forgot password?
