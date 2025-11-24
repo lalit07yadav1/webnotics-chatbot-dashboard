@@ -19,13 +19,9 @@ interface Settings {
   openai_api_key?: string;
   stripe_test?: StripeConfig;
   stripe_live?: StripeConfig;
-  smtp_enabled?: boolean;
-  smtp_host?: string;
-  smtp_port?: number;
-  smtp_user?: string;
-  smtp_password?: string;
-  smtp_from_email?: string;
-  smtp_from_name?: string;
+  resend_api_key?: string | null;
+  resend_from_email?: string | null;
+  resend_from_name?: string | null;
 }
 
 export default function Settings() {
@@ -52,14 +48,10 @@ export default function Settings() {
   const [stripeLiveProductId, setStripeLiveProductId] = useState("");
   const [stripeLivePriceId, setStripeLivePriceId] = useState("");
   
-  // SMTP
-  const [smtpEnabled, setSmtpEnabled] = useState(false);
-  const [smtpHost, setSmtpHost] = useState("");
-  const [smtpPort, setSmtpPort] = useState(587);
-  const [smtpUser, setSmtpUser] = useState("");
-  const [smtpPassword, setSmtpPassword] = useState("");
-  const [smtpFromEmail, setSmtpFromEmail] = useState("");
-  const [smtpFromName, setSmtpFromName] = useState("");
+  // Resend
+  const [resendApiKey, setResendApiKey] = useState("");
+  const [resendFromEmail, setResendFromEmail] = useState("");
+  const [resendFromName, setResendFromName] = useState("");
 
   useEffect(() => {
     fetchSettings();
@@ -115,14 +107,10 @@ export default function Settings() {
         setStripeLivePriceId(settingsData.stripe_live.price_id || "");
       }
       
-      // SMTP
-      setSmtpEnabled(settingsData.smtp_enabled || false);
-      setSmtpHost(settingsData.smtp_host || "");
-      setSmtpPort(settingsData.smtp_port || 587);
-      setSmtpUser(settingsData.smtp_user || "");
-      setSmtpPassword(settingsData.smtp_password || "");
-      setSmtpFromEmail(settingsData.smtp_from_email || "");
-      setSmtpFromName(settingsData.smtp_from_name || "");
+      // Resend
+      setResendApiKey(settingsData.resend_api_key || "");
+      setResendFromEmail(settingsData.resend_from_email || "");
+      setResendFromName(settingsData.resend_from_name || "");
     } catch (err: any) {
       setError(err.message || "Failed to load settings");
       console.error('Error fetching settings:', err);
@@ -184,14 +172,20 @@ export default function Settings() {
         };
       }
 
-      // SMTP
-      if (smtpEnabled !== settings.smtp_enabled) updatePayload.smtp_enabled = smtpEnabled;
-      if (smtpHost !== settings.smtp_host) updatePayload.smtp_host = smtpHost;
-      if (smtpPort !== settings.smtp_port) updatePayload.smtp_port = smtpPort;
-      if (smtpUser !== settings.smtp_user) updatePayload.smtp_user = smtpUser;
-      if (smtpPassword !== settings.smtp_password) updatePayload.smtp_password = smtpPassword;
-      if (smtpFromEmail !== settings.smtp_from_email) updatePayload.smtp_from_email = smtpFromEmail;
-      if (smtpFromName !== settings.smtp_from_name) updatePayload.smtp_from_name = smtpFromName;
+      // Resend
+      const currentResendApiKey = resendApiKey.trim() || null;
+      const currentResendFromEmail = resendFromEmail.trim() || null;
+      const currentResendFromName = resendFromName.trim() || null;
+      
+      if (currentResendApiKey !== (settings.resend_api_key || null)) {
+        updatePayload.resend_api_key = currentResendApiKey;
+      }
+      if (currentResendFromEmail !== (settings.resend_from_email || null)) {
+        updatePayload.resend_from_email = currentResendFromEmail;
+      }
+      if (currentResendFromName !== (settings.resend_from_name || null)) {
+        updatePayload.resend_from_name = currentResendFromName;
+      }
 
       const response = await fetch(`${API_BASE_URL}/settings`, {
         method: 'PUT',
@@ -416,93 +410,56 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* SMTP Configuration */}
+        {/* Resend Email Configuration */}
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-            SMTP Configuration
+            Resend Email Configuration
           </h2>
-          <div className="space-y-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Configure Resend service for sending emails (e.g., password reset emails)
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Switch
-                label="SMTP Enabled"
-                checked={smtpEnabled}
-                onChange={setSmtpEnabled}
-                color="blue"
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Resend API Key <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="password"
+                value={resendApiKey}
+                onChange={(e) => setResendApiKey(e.target.value)}
+                placeholder="re_..."
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Your Resend API key from resend.com
+              </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  SMTP Host
-                </label>
-                <Input
-                  type="text"
-                  value={smtpHost}
-                  onChange={(e) => setSmtpHost(e.target.value)}
-                  placeholder="smtp.gmail.com"
-                  disabled={!smtpEnabled}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  SMTP Port
-                </label>
-                <Input
-                  type="number"
-                  value={smtpPort}
-                  onChange={(e) => setSmtpPort(Number(e.target.value))}
-                  placeholder="587"
-                  disabled={!smtpEnabled}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  SMTP User
-                </label>
-                <Input
-                  type="text"
-                  value={smtpUser}
-                  onChange={(e) => setSmtpUser(e.target.value)}
-                  placeholder="your-email@gmail.com"
-                  disabled={!smtpEnabled}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  SMTP Password
-                </label>
-                <Input
-                  type="password"
-                  value={smtpPassword}
-                  onChange={(e) => setSmtpPassword(e.target.value)}
-                  placeholder="your-app-password"
-                  disabled={!smtpEnabled}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  From Email
-                </label>
-                <Input
-                  type="email"
-                  value={smtpFromEmail}
-                  onChange={(e) => setSmtpFromEmail(e.target.value)}
-                  placeholder="noreply@webnotics.com"
-                  disabled={!smtpEnabled}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  From Name
-                </label>
-                <Input
-                  type="text"
-                  value={smtpFromName}
-                  onChange={(e) => setSmtpFromName(e.target.value)}
-                  placeholder="Webnotics Chatbot"
-                  disabled={!smtpEnabled}
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                From Email <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="email"
+                value={resendFromEmail}
+                onChange={(e) => setResendFromEmail(e.target.value)}
+                placeholder="onboarding@resend.dev"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Verified sender email address in Resend
+              </p>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                From Name
+              </label>
+              <Input
+                type="text"
+                value={resendFromName}
+                onChange={(e) => setResendFromName(e.target.value)}
+                placeholder="Webnotics Chatbot"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Display name for sent emails
+              </p>
             </div>
           </div>
         </div>
