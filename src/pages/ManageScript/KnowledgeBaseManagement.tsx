@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import RichTextEditor from "../../components/form/rich-text-editor/RichTextEditor";
 
 interface Website { id: number; website_url: string; }
 interface KBItem { id: number; website_id: number; question: string; answer: string; created_at: string; updated_at: string; }
@@ -155,7 +156,13 @@ export default function KnowledgeBaseManagement() {
 
       <form onSubmit={handleSubmit} className="max-w-xl space-y-4">
         <input className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white" placeholder="Question" value={question} onChange={(e) => setQuestion(e.target.value)} required />
-        <textarea className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white min-h-28" placeholder="Answer" value={answer} onChange={(e) => setAnswer(e.target.value)} required />
+        <div className="w-full">
+          <RichTextEditor
+            value={answer}
+            onChange={setAnswer}
+            placeholder="Enter your answer..."
+          />
+        </div>
         <button type="submit" disabled={submitting || !selectedWebsiteId} className="px-4 py-2 rounded-lg bg-brand-500 text-white disabled:opacity-60">{submitting ? 'Adding…' : 'Add Knowledge Base'}</button>
         {message && <p className="text-green-500 text-sm">{message}</p>}
         {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -173,7 +180,11 @@ export default function KnowledgeBaseManagement() {
                 {editingId === it.id ? (
                   <div className="space-y-2">
                     <input className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white" value={editQuestion} onChange={(e) => setEditQuestion(e.target.value)} />
-                    <textarea className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-black text-white min-h-24" value={editAnswer} onChange={(e) => setEditAnswer(e.target.value)} />
+                    <RichTextEditor
+                      value={editAnswer}
+                      onChange={setEditAnswer}
+                      placeholder="Enter your answer..."
+                    />
                     <div className="flex gap-2">
                       <button disabled={savingEdit} onClick={saveEdit} className="px-3 py-1 rounded bg-brand-500 text-white disabled:opacity-60">{savingEdit ? 'Saving…' : 'Save'}</button>
                       <button onClick={() => setEditingId(null)} className="px-3 py-1 rounded bg-gray-700 text-white">Cancel</button>
@@ -182,7 +193,13 @@ export default function KnowledgeBaseManagement() {
                 ) : (
                   <>
                     <p className="text-white font-medium">Q: {it.question}</p>
-                    <p className="text-gray-300">A: {it.answer}</p>
+                    <div className="text-gray-300">
+                      <span className="text-gray-300">A: </span>
+                      <div 
+                        className="prose prose-invert max-w-none mt-1"
+                        dangerouslySetInnerHTML={{ __html: it.answer }}
+                      />
+                    </div>
                     <p className="text-gray-500 text-xs mt-1">Updated: {new Date(it.updated_at).toLocaleString()}</p>
                     <div className="flex gap-2 mt-2">
                       <button onClick={() => startEdit(it)} className="px-3 py-1 rounded bg-gray-700 text-white">Edit</button>
