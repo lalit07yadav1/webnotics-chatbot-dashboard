@@ -179,26 +179,83 @@
         padding: 0 !important;
       }
       
+      #webnotics-chatbot .webnotics-bot-message h1 {
+        font-weight: bold !important;
+        font-size: 1.5em !important;
+        margin-bottom: 12px !important;
+        margin-top: 8px !important;
+        line-height: 1.3 !important;
+      }
       #webnotics-chatbot .webnotics-bot-message h2 {
-      font-style: italic;
-      font-weight: bold;
-      margin-bottom: 15px !important;
+        font-weight: bold !important;
+        font-size: 1.3em !important;
+        margin-bottom: 12px !important;
+        margin-top: 8px !important;
+        line-height: 1.3 !important;
       }
       #webnotics-chatbot .webnotics-bot-message h3 {
-      font-style: italic;
-      font-weight: bold !important;
-      margin-bottom: 10px !important;
+        font-weight: bold !important;
+        font-size: 1.1em !important;
+        margin-bottom: 10px !important;
+        margin-top: 8px !important;
+        line-height: 1.3 !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message h4,
+      #webnotics-chatbot .webnotics-bot-message h5,
+      #webnotics-chatbot .webnotics-bot-message h6 {
+        font-weight: bold !important;
+        margin-bottom: 8px !important;
+        margin-top: 6px !important;
+        line-height: 1.3 !important;
       }
       #webnotics-chatbot .webnotics-bot-message p {
-      margin-bottom: 10px !important;
+        margin-bottom: 10px !important;
+        line-height: 1.6 !important;
       }
-#webnotics-chatbot .webnotics-bot-message ul li {
-margin-bottom: 10px !important;
-}
-#webnotics-chatbot .webnotics-bot-message a {
-text-decoration: underline !important;
-    font-style: italic !important;
-    }
+      #webnotics-chatbot .webnotics-bot-message ul,
+      #webnotics-chatbot .webnotics-bot-message ol {
+        margin: 10px 0 !important;
+        padding-left: 20px !important;
+        list-style-position: outside !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message ul {
+        list-style-type: disc !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message ol {
+        list-style-type: decimal !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message ul li,
+      #webnotics-chatbot .webnotics-bot-message ol li {
+        margin-bottom: 8px !important;
+        line-height: 1.6 !important;
+        padding-left: 4px !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message strong,
+      #webnotics-chatbot .webnotics-bot-message b {
+        font-weight: bold !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message em,
+      #webnotics-chatbot .webnotics-bot-message i {
+        font-style: italic !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message u {
+        text-decoration: underline !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message a {
+        text-decoration: underline !important;
+        color: inherit !important;
+        cursor: pointer !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message a:hover {
+        opacity: 0.8 !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message div {
+        margin-bottom: 8px !important;
+        line-height: 1.6 !important;
+      }
+      #webnotics-chatbot .webnotics-bot-message br {
+        line-height: 1.6 !important;
+      }
       #webnotics-chatbot button,
       #webnotics-form-overlay button,
       #webnotics-toggle {
@@ -1143,11 +1200,24 @@ text-decoration: underline !important;
     const textColor = isUser ? customization.user_message_bg_text_color : customization.bot_message_bg_text_color;
     const fontFamily = isUser ? customization.user_message_font_family : customization.font_family;
     const fontSize = isUser ? customization.user_message_bg_font_size : customization.bot_message_bg_font_size;
+    
+    // User messages: narrower width, right-aligned
+    // Bot messages: full width, left-aligned
+    const userMessageStyle = isUser ? `
+      width: auto;
+      max-width: 80%;
+      margin-left: auto;
+      text-align: right;
+    ` : `
+      width: 100%;
+      max-width: 100%;
+      text-align: left;
+    `;
+    
     msgEl.style.cssText = addImportant(`
       padding: 12px 16px;
       border-radius: 16px;
-      width: 100%;
-      max-width: 100%;
+      ${userMessageStyle}
       word-wrap: break-word;
       line-height: 1.5;
       background: ${background};
@@ -1166,7 +1236,7 @@ text-decoration: underline !important;
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = message;
       // Only allow safe HTML tags
-      const allowedTags = ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a'];
+      const allowedTags = ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'div', 'span'];
       const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_ELEMENT);
       const nodesToRemove = [];
       let node;

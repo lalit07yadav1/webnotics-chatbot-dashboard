@@ -121,18 +121,21 @@ export default function ChatbotPreview({
           {/* Bot Welcome Message */}
           {botMessageUserMessage && (
             <div
+              className="bot-message-preview"
               style={{
                 padding: '12px 16px',
                 borderRadius: '16px',
-                maxWidth: '80%',
+                width: '100%',
+                maxWidth: '100%',
                 wordWrap: 'break-word',
                 lineHeight: 1.5,
                 background: botMessageBg,
                 color: botMessageBgTextColor,
                 fontFamily: fontFamily,
                 fontSize: botMessageBgFontSize,
-                alignSelf: 'flex-start',
+                textAlign: 'left',
                 boxShadow: '0 6px 16px rgba(15, 23, 42, 0.15)',
+                marginBottom: '8px',
               }}
             >
               {botMessageUserMessage}
@@ -144,6 +147,7 @@ export default function ChatbotPreview({
             style={{
               padding: '12px 16px',
               borderRadius: '16px',
+              width: 'auto',
               maxWidth: '80%',
               wordWrap: 'break-word',
               lineHeight: 1.5,
@@ -151,31 +155,44 @@ export default function ChatbotPreview({
               color: userMessageBgTextColor,
               fontFamily: userMessageFontFamily,
               fontSize: userMessageBgFontSize,
-              alignSelf: 'flex-end',
+              marginLeft: 'auto',
+              textAlign: 'right',
               boxShadow: '0 6px 16px rgba(15, 23, 42, 0.15)',
+              marginBottom: '8px',
             }}
           >
             Hello! How can I help?
           </div>
 
-          {/* Sample Bot Response */}
+          {/* Sample Bot Response with HTML formatting */}
           <div
+            className="bot-message-preview"
             style={{
               padding: '12px 16px',
               borderRadius: '16px',
-              maxWidth: '80%',
+              width: '100%',
+              maxWidth: '100%',
               wordWrap: 'break-word',
               lineHeight: 1.5,
               background: botMessageBg,
               color: botMessageBgTextColor,
               fontFamily: fontFamily,
               fontSize: botMessageBgFontSize,
-              alignSelf: 'flex-start',
+              textAlign: 'left',
               boxShadow: '0 6px 16px rgba(15, 23, 42, 0.15)',
+              marginBottom: '8px',
             }}
-          >
-            I'm here to help! What would you like to know?
-          </div>
+            dangerouslySetInnerHTML={{
+              __html: `<h3 style="font-weight: bold; font-size: 1.1em; margin-bottom: 10px; margin-top: 8px; line-height: 1.3;">Contact Information</h3>
+<p style="margin-bottom: 10px; line-height: 1.6;"><strong>Phone:</strong> (760) 728-1295</p>
+<p style="margin-bottom: 10px; line-height: 1.6;"><strong>Email:</strong> <a href="mailto:info@example.com" style="text-decoration: underline; color: inherit; cursor: pointer;">info@example.com</a></p>
+<ul style="margin: 10px 0; padding-left: 20px; list-style-type: disc; list-style-position: outside;">
+  <li style="margin-bottom: 8px; line-height: 1.6; padding-left: 4px;">Monday - Friday: 9 AM - 5 PM</li>
+  <li style="margin-bottom: 8px; line-height: 1.6; padding-left: 4px;">Saturday: 10 AM - 2 PM</li>
+  <li style="margin-bottom: 8px; line-height: 1.6; padding-left: 4px;">Sunday: Closed</li>
+</ul>`
+            }}
+          />
         </div>
 
         {/* Input Area */}
@@ -213,6 +230,83 @@ export default function ChatbotPreview({
                 color: ${inputPlaceholderTextColor};
                 font-family: ${inputPlaceholderFontFamily || fontFamily};
                 opacity: 0.7;
+              }
+              .bot-message-preview h1 {
+                font-weight: bold !important;
+                font-size: 1.5em !important;
+                margin-bottom: 12px !important;
+                margin-top: 8px !important;
+                line-height: 1.3 !important;
+              }
+              .bot-message-preview h2 {
+                font-weight: bold !important;
+                font-size: 1.3em !important;
+                margin-bottom: 12px !important;
+                margin-top: 8px !important;
+                line-height: 1.3 !important;
+              }
+              .bot-message-preview h3 {
+                font-weight: bold !important;
+                font-size: 1.1em !important;
+                margin-bottom: 10px !important;
+                margin-top: 8px !important;
+                line-height: 1.3 !important;
+              }
+              .bot-message-preview h4,
+              .bot-message-preview h5,
+              .bot-message-preview h6 {
+                font-weight: bold !important;
+                margin-bottom: 8px !important;
+                margin-top: 6px !important;
+                line-height: 1.3 !important;
+              }
+              .bot-message-preview p {
+                margin-bottom: 10px !important;
+                line-height: 1.6 !important;
+              }
+              .bot-message-preview ul,
+              .bot-message-preview ol {
+                margin: 10px 0 !important;
+                padding-left: 20px !important;
+                list-style-position: outside !important;
+              }
+              .bot-message-preview ul {
+                list-style-type: disc !important;
+              }
+              .bot-message-preview ol {
+                list-style-type: decimal !important;
+              }
+              .bot-message-preview ul li,
+              .bot-message-preview ol li {
+                margin-bottom: 8px !important;
+                line-height: 1.6 !important;
+                padding-left: 4px !important;
+              }
+              .bot-message-preview strong,
+              .bot-message-preview b {
+                font-weight: bold !important;
+              }
+              .bot-message-preview em,
+              .bot-message-preview i {
+                font-style: italic !important;
+              }
+              .bot-message-preview u {
+                text-decoration: underline !important;
+              }
+              .bot-message-preview a {
+                text-decoration: underline !important;
+                color: inherit !important;
+                cursor: pointer !important;
+              }
+              .bot-message-preview a:hover {
+                opacity: 0.8 !important;
+              }
+              .bot-message-preview div {
+                margin-bottom: 8px !important;
+                line-height: 1.6 !important;
+              }
+              .bot-message-preview br {
+                line-height: 1.6 !important;
               }
             `}
           </style>
