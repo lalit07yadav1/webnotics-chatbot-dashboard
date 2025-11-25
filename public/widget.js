@@ -276,11 +276,14 @@
         appearance: none !important;
         outline: none !important;
       }
-      #webnotics-chatbot input, #webnotics-form-overlay input {
+      #webnotics-chatbot input, #webnotics-form-overlay input,
+      #webnotics-chatbot textarea, #webnotics-form-overlay textarea {
       color: #000000;
       } 
       #webnotics-chatbot input,
-      #webnotics-form-overlay input {
+      #webnotics-form-overlay input,
+      #webnotics-chatbot textarea,
+      #webnotics-form-overlay textarea {
         font-family: inherit !important;
         font-size: inherit !important;
         line-height: inherit !important;
@@ -1040,11 +1043,11 @@
       border-radius: 0 0 17px 17px !important;
     `);
 
-    const input = document.createElement('input');
+    const input = document.createElement('textarea');
     input.id = 'webnotics-chat-input';
     input.className = 'webnotics-chat-input';
-    input.type = 'text';
     input.placeholder = customization.input_placeholder_text || 'Type your message...';
+    input.rows = 1;
     input.style.cssText = addImportant(`
       flex: 1;
       padding: 12px 16px;
@@ -1056,7 +1059,17 @@
       font-size: 14px;
       outline: none;
       min-width: 0;
+      resize: none;
+      overflow-y: auto;
+      max-height: 120px;
+      line-height: 1.5;
     `);
+    
+    // Auto-resize textarea
+    input.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
 
     const placeholderStyleId = `webnotics-placeholder-style-${publishKey}`;
     let placeholderStyle = document.getElementById(placeholderStyleId);
@@ -1104,8 +1117,11 @@
       sendMessage();
     };
 
-    input.onkeypress = (e) => {
-      if (e.key === 'Enter') {
+    input.onkeydown = (e) => {
+      // Shift + Enter: new line
+      // Enter (without Shift): send message
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         if (!userInfo) {
           showUserForm((info) => {
             userInfo = info;
@@ -1115,6 +1131,7 @@
         }
         sendMessage();
       }
+      // Allow Shift+Enter to create new line (default behavior)
     };
 
     inputArea.appendChild(input);
@@ -1268,6 +1285,10 @@
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
     input.value = '';
+    // Reset textarea height after sending
+    if (input.tagName.toLowerCase() === 'textarea') {
+      input.style.height = 'auto';
+    }
     input.disabled = true;
 
     // Show typing indicator with animation
@@ -1398,6 +1419,10 @@
     }
 
     input.disabled = false;
+    // Reset textarea height when re-enabled
+    if (input.tagName.toLowerCase() === 'textarea') {
+      input.style.height = 'auto';
+    }
     input.focus();
   }
 
