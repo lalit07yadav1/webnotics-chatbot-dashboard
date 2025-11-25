@@ -602,8 +602,23 @@ export default function WebsiteUrlManagement() {
         <button
           type="submit"
           disabled={loading}
-            className="px-6 py-2 rounded-lg bg-brand-500 text-white disabled:opacity-60 disabled:cursor-not-allowed hover:bg-brand-600 transition-colors"
+            className="px-6 py-2 rounded-lg bg-brand-500 text-white disabled:opacity-60 disabled:cursor-not-allowed hover:bg-brand-600 transition-colors flex items-center justify-center gap-2"
         >
+            {loading && (
+              <svg
+                className="w-4 h-4 animate-spin"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            )}
             {loading ? 'Crawling...' : 'Crawl Website'}
         </button>
           
@@ -723,8 +738,23 @@ export default function WebsiteUrlManagement() {
             <button
               onClick={handleContinue}
               disabled={savingLoading}
-              className="px-6 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-6 py-2 rounded-lg bg-brand-500 text-white hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
+              {savingLoading && (
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              )}
               {savingLoading ? 'Saving...' : 'Continue'}
             </button>
           </div>
@@ -849,8 +879,23 @@ export default function WebsiteUrlManagement() {
                           <button
                             type="submit"
                             disabled={editLoading}
-                            className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                           >
+                            {editLoading && (
+                              <svg
+                                className="w-4 h-4 animate-spin"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                              </svg>
+                            )}
                             {editLoading ? 'Crawling...' : 'Crawl Website'}
                           </button>
                           <button
@@ -970,9 +1015,24 @@ export default function WebsiteUrlManagement() {
                           <button
                             onClick={handleUpdateWebsite}
                             disabled={updatingWebsite}
-                            className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="flex-1 px-3 py-2 rounded-lg bg-brand-500 text-white text-sm hover:bg-brand-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                           >
-                            {updatingWebsite ? 'Updating...' : 'Save Changes'}
+                            {updatingWebsite && (
+                              <svg
+                                className="w-4 h-4 animate-spin"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                              </svg>
+                            )}
+                            {updatingWebsite ? 'Saving...' : 'Save Changes'}
                           </button>
                           <button
                             onClick={handleCancelEdit}
