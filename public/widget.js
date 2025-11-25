@@ -963,7 +963,7 @@ text-decoration: underline !important;
       max-height: 400px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 12px;
       font-family: ${customization.font_family};
     `);
 
@@ -1143,19 +1143,19 @@ text-decoration: underline !important;
     const textColor = isUser ? customization.user_message_bg_text_color : customization.bot_message_bg_text_color;
     const fontFamily = isUser ? customization.user_message_font_family : customization.font_family;
     const fontSize = isUser ? customization.user_message_bg_font_size : customization.bot_message_bg_font_size;
-    const alignment = isUser ? 'margin-left: auto;' : 'margin-right: auto;';
     msgEl.style.cssText = addImportant(`
       padding: 12px 16px;
       border-radius: 16px;
-      max-width: 80%;
+      width: 100%;
+      max-width: 100%;
       word-wrap: break-word;
       line-height: 1.5;
       background: ${background};
       color: ${textColor};
       font-family: ${fontFamily};
       font-size: ${fontSize};
-      ${alignment}
       box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+      margin-bottom: 8px;
     `);
 
     // For bot messages, render HTML; for user messages, escape HTML for security
@@ -1230,9 +1230,11 @@ text-decoration: underline !important;
       font-style: italic;
       font-family: ${customization.font_family};
       font-size: ${customization.bot_message_bg_font_size};
-      align-self: flex-start;
+      width: 100%;
+      max-width: 100%;
       display: flex;
       align-items: center;
+      margin-bottom: 8px;
     `);
 
     // Add CSS animation for typing dots
