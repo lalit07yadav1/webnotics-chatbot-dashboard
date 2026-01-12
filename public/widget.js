@@ -19,7 +19,7 @@
     return;
   }
 
-  const API_BASE = 'https://webnotics-chatbot.onrender.com';
+  const API_BASE = 'http://206.189.125.220:8000';
   const STORAGE_KEY = `webnotics_chat_${publishKey}`;
   const USER_KEY = `webnotics_user_${publishKey}`;
 

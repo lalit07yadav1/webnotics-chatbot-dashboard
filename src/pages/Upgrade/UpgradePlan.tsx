@@ -10,7 +10,7 @@ import countries from "../../data/countries.json";
 import statesByCountry from "../../data/states.json";
 import { State } from "country-state-city";
 
-const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'http://206.189.125.220:8000';
 
 interface UserProfile {
   name?: string;

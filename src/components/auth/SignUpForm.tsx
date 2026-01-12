@@ -9,7 +9,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'http://206.189.125.220:8000';
 
 export default function SignUpForm() {
   const navigate = useNavigate();

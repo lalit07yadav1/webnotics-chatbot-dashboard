@@ -26,7 +26,7 @@ Open the printed local URL.
 
 ## Pages
 
-- Signup: supports Free and Paid plans. Paid plan uses Stripe Card Element and calls `https://webnotics-chatbot.onrender.com/create-account`.
-- Login: placeholder form that posts to `https://webnotics-chatbot.onrender.com/login`.
+- Signup: supports Free and Paid plans. Paid plan uses Stripe Card Element and calls `http://206.189.125.220:8000/create-account`.
+- Login: placeholder form that posts to `http://206.189.125.220:8000/login`.
 
 Update backend URLs as needed.

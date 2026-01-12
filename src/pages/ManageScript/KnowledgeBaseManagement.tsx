@@ -4,7 +4,7 @@ import RichTextEditor from "../../components/form/rich-text-editor/RichTextEdito
 interface Website { id: number; website_url: string; }
 interface KBItem { id: number; website_id: number; question: string; answer: string; created_at: string; updated_at: string; }
 
-const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'http://206.189.125.220:8000';
 
 export default function KnowledgeBaseManagement() {
   const [websites, setWebsites] = useState<Website[]>([]);

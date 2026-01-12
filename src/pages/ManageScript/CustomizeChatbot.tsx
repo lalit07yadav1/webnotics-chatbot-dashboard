@@ -165,7 +165,7 @@ interface Customization {
   submit_button_font_family: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'https://webnotics-chatbot.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_WEBSITE_URL || 'http://206.189.125.220:8000';
 
 export default function CustomizeChatbot() {
   const [websites, setWebsites] = useState<Website[]>([]);

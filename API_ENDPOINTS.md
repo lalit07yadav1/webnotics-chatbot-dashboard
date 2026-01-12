@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-https://webnotics-chatbot.onrender.com
+http://206.189.125.220:8000
 ```
 *Configurable via environment variable: `VITE_WEBSITE_URL`*
 
