@@ -1,0 +1,14 @@
+# .htaccess for React Admin Dashboard
+# This ensures React Router works correctly
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /webnoticschatbot/admin/
+  
+  # Don't rewrite files or directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Rewrite everything else to index.html
+  RewriteRule . /webnoticschatbot/admin/index.html [L]
+</IfModule>

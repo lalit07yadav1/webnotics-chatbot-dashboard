@@ -19,7 +19,8 @@
     return;
   }
 
-  const API_BASE = 'http://206.189.125.220:8000';
+  // API_BASE will be replaced by Vite plugin from .env file
+  const API_BASE = '__VITE_API_BASE_URL__';
   const STORAGE_KEY = `webnotics_chat_${publishKey}`;
   const USER_KEY = `webnotics_user_${publishKey}`;
 
